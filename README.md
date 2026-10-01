@@ -35,3 +35,4 @@ Referenced third-party packs and personal saved settings are not included.
 
 - [AnyoneCore example repository](https://github.com/anyoneminion/reactions-example)
 - [Third-party installation example](https://github.com/Jacob5800/Reactionsoccult/blob/main/README.md)
+
