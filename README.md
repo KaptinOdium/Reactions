@@ -5,7 +5,7 @@ Custom TensorReactions profiles distributed through AnyoneCore.
 ## Install and update
 
 1. Open **AnyoneCore > SYSTEM > Third Party > Sources**.
-2. Add `https://github.com/KaptinOdium/Draws`.
+2. Add `https://github.com/KaptinOdium/Reactions`.
 3. Open **Updater**, update this source, then reload as prompted.
 4. Select the desired general or timeline profile in TensorReactions.
 
