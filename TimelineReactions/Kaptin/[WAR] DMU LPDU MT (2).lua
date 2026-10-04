@@ -1944,17 +1944,6 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
-				name = "Lj\\umad\\draws_lpdu",
-				uuid = "90bae3e2-4467-b53e-d428-2a6c58f5cc72",
-			},
-			inheritanceRoot = "Lj\\umad\\draws_lpdu",
-			objectType = "folder",
-		},
-		
-		{
-			data = 
-			{
-				displayPath = "",
 				name = "store\\anyone\\dmu\\main",
 				uuid = "1436796e-59bd-521a-b548-d38cf25fcb7e",
 			},
@@ -6367,20 +6356,6 @@ local tbl =
 			},
 		},
 	},
-	[161] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "Lj\\umad\\draws_lpdu",
-				uuid = "5311a76b-db05-9bb7-aa33-0c511945017b",
-			},
-			inheritanceRoot = "Lj\\umad\\draws_lpdu",
-			objectType = "folder",
-		},
-	},
 	[162] = 
 	{
 		
@@ -7312,7 +7287,7 @@ local tbl =
 				{
 				},
 				mechanicTime = 1060.5180184963,
-				name = "[WAR] Equilibr�um",
+				name = "[WAR] Equilibríum",
 				timelineIndex = 208,
 				timerOffset = -10,
 				uuid = "7cfc43ac-fca0-c423-b97d-600e0527eafc",
