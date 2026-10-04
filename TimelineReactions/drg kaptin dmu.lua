@@ -403,6 +403,17 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
+				name = "Lj\\umad\\draws_lpdu",
+				uuid = "8eaf483a-10f9-2906-c6f3-dc544696b24a",
+			},
+			inheritanceRoot = "Lj\\umad\\draws_lpdu",
+			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				displayPath = "",
 				name = "store\\anyone\\dmu\\main",
 				uuid = "8d753d26-5a87-6562-cfcf-0354014eec36",
 			},
@@ -1819,6 +1830,20 @@ local tbl =
 				uuid = "4815b8e6-b06f-c142-66c5-25d4427c30b6",
 			},
 			inheritanceRoot = "store\\anyone\\dmu\\main",
+			objectType = "folder",
+		},
+	},
+	[161] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "Lj\\umad\\draws_lpdu",
+				uuid = "6f95df93-84de-e62f-7ca3-8c698560ed23",
+			},
+			inheritanceRoot = "Lj\\umad\\draws_lpdu",
 			objectType = "folder",
 		},
 	},
