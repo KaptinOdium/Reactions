@@ -7314,7 +7314,7 @@ local tbl =
 				{
 				},
 				mechanicTime = 1060.5180184963,
-				name = "[WAR] Equilibr�um",
+				name = "[WAR] Equilibríum",
 				timelineIndex = 208,
 				timerOffset = -10,
 				uuid = "7cfc43ac-fca0-c423-b97d-600e0527eafc",
