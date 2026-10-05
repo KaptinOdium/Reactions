@@ -6818,8 +6818,9 @@ local tbl =
 					{
 						data = 
 						{
-							aType = "ACR",
+							actionID = 25751,
 							gVar = "ACR_RikuWAR3_Tankbar_Bloodwhetting",
+							ignoreWeaveRules = true,
 							uuid = "3cc9ce9a-5ff7-102f-8bc8-4f1721475d6f",
 							variableTogglesType = 3,
 							version = 2.1,
@@ -6833,9 +6834,9 @@ local tbl =
 				name = "[WAR] Whetting - P5 opening autos",
 				timeRange = true,
 				timelineIndex = 177,
-				timerEndOffset = -0.60000002384186,
+				timerEndOffset = -0.9,
 				timerOffset = -2,
-				timerStartOffset = -2,
+				timerStartOffset = -1.6,
 				uuid = "03d68a05-a7c0-23f8-8f10-92d651398335",
 				version = 2,
 			},
@@ -7009,8 +7010,9 @@ local tbl =
 					{
 						data = 
 						{
-							aType = "ACR",
+							actionID = 25751,
 							gVar = "ACR_RikuWAR3_Tankbar_Bloodwhetting",
+							ignoreWeaveRules = true,
 							uuid = "7bfdbdd9-3735-6ee8-9e49-bd271a4001c3",
 							variableTogglesType = 3,
 							version = 2.1,
@@ -7312,7 +7314,7 @@ local tbl =
 				{
 				},
 				mechanicTime = 1060.5180184963,
-				name = "[WAR] Equilibríum",
+				name = "[WAR] Equilibr�um",
 				timelineIndex = 208,
 				timerOffset = -10,
 				uuid = "7cfc43ac-fca0-c423-b97d-600e0527eafc",
@@ -7346,7 +7348,7 @@ local tbl =
 				timelineIndex = 208,
 				timerEndOffset = -1,
 				timerOffset = -2,
-				timerStartOffset = -3,
+				timerStartOffset = -4.5,
 				uuid = "3f343ca9-2b27-4786-a924-a7b33f073d2d",
 				version = 2,
 			},
