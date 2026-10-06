@@ -7,17 +7,6 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
-				name = "Zelenia Kaptin draws",
-				uuid = "b6e94389-83e4-775d-15e8-062b14587059",
-			},
-			inheritanceRoot = "Zelenia Kaptin draws",
-			objectType = "folder",
-		},
-		
-		{
-			data = 
-			{
-				displayPath = "",
 				name = "store\\anyone\\extremes\\zelenia\\main",
 				uuid = "bafdb246-1117-da8a-b792-45d0c1891cf6",
 			},
@@ -100,20 +89,6 @@ local tbl =
 				uuid = "6947d653-940c-b927-9bee-fdfd4bc2f1c3",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
-			objectType = "folder",
-		},
-	},
-	[9] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "Zelenia Kaptin draws",
-				uuid = "0a111ca1-f9c1-aed5-1c74-c2b32c8e0c71",
-			},
-			inheritanceRoot = "Zelenia Kaptin draws",
 			objectType = "folder",
 		},
 	},
@@ -315,20 +290,6 @@ local tbl =
 			},
 		},
 	},
-	[27] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "Zelenia Kaptin draws",
-				uuid = "335885fd-2d5b-8161-f6c7-21eb812bbc4d",
-			},
-			inheritanceRoot = "Zelenia Kaptin draws",
-			objectType = "folder",
-		},
-	},
 	[30] = 
 	{
 		
@@ -403,17 +364,6 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
-				name = "Zelenia Kaptin draws",
-				uuid = "e1734dad-625e-a851-5640-56e74012cafd",
-			},
-			inheritanceRoot = "Zelenia Kaptin draws",
-			objectType = "folder",
-		},
-		
-		{
-			data = 
-			{
-				displayPath = "",
 				name = "store\\anyone\\extremes\\zelenia\\main",
 				uuid = "d5ef873a-7537-5efe-423c-61cca929262a",
 			},
@@ -432,20 +382,6 @@ local tbl =
 				uuid = "51a1266f-32bb-84a3-bbc1-6d81369470df",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
-			objectType = "folder",
-		},
-	},
-	[44] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "Zelenia Kaptin draws",
-				uuid = "57f8c60c-7a52-ab68-a5a6-39fac5b462dc",
-			},
-			inheritanceRoot = "Zelenia Kaptin draws",
 			objectType = "folder",
 		},
 	},
@@ -611,20 +547,6 @@ local tbl =
 			objectType = "folder",
 		},
 	},
-	[58] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "Zelenia Kaptin draws",
-				uuid = "262112cf-5f7c-1d83-57c5-3e8506b056df",
-			},
-			inheritanceRoot = "Zelenia Kaptin draws",
-			objectType = "folder",
-		},
-	},
 	[62] = 
 	{
 		
@@ -703,20 +625,6 @@ local tbl =
 			},
 		},
 	},
-	[64] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "Zelenia Kaptin draws",
-				uuid = "9e656bb2-5c84-354e-707e-ea7446b57a02",
-			},
-			inheritanceRoot = "Zelenia Kaptin draws",
-			objectType = "folder",
-		},
-	},
 	[66] = 
 	{
 		
@@ -728,20 +636,6 @@ local tbl =
 				uuid = "b53cdca3-81d7-cf8f-092c-36d9b808f813",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
-			objectType = "folder",
-		},
-	},
-	[69] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "Zelenia Kaptin draws",
-				uuid = "a01a72f7-e611-e3ab-3060-0df9c2903607",
-			},
-			inheritanceRoot = "Zelenia Kaptin draws",
 			objectType = "folder",
 		},
 	},
@@ -907,20 +801,6 @@ local tbl =
 			objectType = "folder",
 		},
 	},
-	[77] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "Zelenia Kaptin draws",
-				uuid = "7f2e21e2-17cd-8bbe-5ca4-8e00ab1fb0b2",
-			},
-			inheritanceRoot = "Zelenia Kaptin draws",
-			objectType = "folder",
-		},
-	},
 	[82] = 
 	{
 		
@@ -1073,17 +953,6 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
-				name = "Zelenia Kaptin draws",
-				uuid = "72576e4c-41b6-5208-7496-d7721e35c61c",
-			},
-			inheritanceRoot = "Zelenia Kaptin draws",
-			objectType = "folder",
-		},
-		
-		{
-			data = 
-			{
-				displayPath = "",
 				name = "store\\anyone\\extremes\\zelenia\\main",
 				uuid = "467158cf-b9ec-100b-dfa9-9c55a19df5bf",
 			},
@@ -1130,20 +999,6 @@ local tbl =
 				uuid = "76184a67-c52f-6b73-597b-88b15aa8b5d7",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
-			objectType = "folder",
-		},
-	},
-	[112] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "Zelenia Kaptin draws",
-				uuid = "a355e440-b93d-6734-db61-44d6f30ce010",
-			},
-			inheritanceRoot = "Zelenia Kaptin draws",
 			objectType = "folder",
 		},
 	},
