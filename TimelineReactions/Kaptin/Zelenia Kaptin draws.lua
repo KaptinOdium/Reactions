@@ -7,6 +7,17 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "4af6c9de-8901-c73a-7ac6-e8e87c6d356e",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				displayPath = "",
 				name = "Kaptin Settings",
 				uuid = "1dd4d688-1e39-e42b-9bb2-ff105b0d0ea7",
 			},
@@ -501,7 +512,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "local s = data.kaptinZeleniaBaits\nif not s then\n    s = { orders = {}, players = {}, draws = {}, selected = {} }\n    function s.sortDistance(a, b)\n        if a.distance == b.distance then return a.id < b.id end\n        return a.distance < b.distance\n    end\n    data.kaptinZeleniaBaits = s\nend\ns.selected = s.selected or {}\ns.nearDrawer = s.nearDrawer or TensorCore.getStaticDrawer(GUI:ColorConvertFloat4ToU32(1, 0.15, 0.15, 0.35))\ns.farDrawer = s.farDrawer or TensorCore.getStaticDrawer(GUI:ColorConvertFloat4ToU32(0.1, 0.45, 1, 0.35))\nfor key, uuid in pairs(s.draws) do Argus.deleteTimedShape(uuid); s.draws[key] = nil end\nfor i = #s.orders, 1, -1 do s.orders[i] = nil end\nfor i = #s.players, 1, -1 do s.players[i] = nil end\nfor _, entity in pairs(TensorCore.getEntityGroupList(\"Party\", { noAliveCheck = true }) or {}) do\n    s.players[#s.players + 1] = { id = entity.id, distance = 0 }\nend\ns.boss = eventArgs.entityID\ns.wave = 1\ns.hits = 0\ns.active = true\ns.showAt = Now() + eventArgs.channelTimeMax * 1000 - 3500\ns.endAt = Now() + eventArgs.channelTimeMax * 1000 + 11200\nself.used = true",
+							actionLua = "local s = data.kaptinZeleniaBaits\nif not s then\n    s = { orders = {}, players = {}, draws = {}, selected = {} }\n    function s.sortDistance(a, b)\n        if a.distance == b.distance then return a.id < b.id end\n        return a.distance < b.distance\n    end\n    -- A destination marker plus an entity-attached arrow; fixed lifetime per key.\n    function s.clearGuide(state)\n        if state.dot then Argus.deleteTimedShape(state.dot); state.dot = nil end\n        if state.arrow then Argus.deleteTimedShape(state.arrow); state.arrow = nil end\n        state.lastKey, state.guideEnd = nil, nil\n    end\n    function s.guide(state, key, x, z, duration, arrow)\n        local now = Now()\n        if duration <= 0 then state.clearGuide(state); return end\n        local p = TensorCore.mGetPlayer()\n        if not p then return end\n        local drawer = TensorCore.getStaticDrawer(0xFF50FF50)\n        if state.lastKey ~= key then\n            state.clearGuide(state)\n            state.lastKey, state.guideEnd = key, now + duration\n            state.dot = drawer:addTimedCircle(duration, x, p.pos.y, z, 0.45, 0, false, true)\n        end\n        local remaining = state.guideEnd - now\n        if remaining <= 0 then\n            if state.dot then Argus.deleteTimedShape(state.dot); state.dot = nil end\n            if state.arrow then Argus.deleteTimedShape(state.arrow); state.arrow = nil end\n            return\n        end\n        if state.dot then drawer:updateTimedCircle(state.dot, nil, x, p.pos.y, z, 0.45, 0, false, true) end\n        state.destination = state.destination or { x = 0, y = 0, z = 0 }\n        state.destination.x, state.destination.y, state.destination.z = x, p.pos.y, z\n        local length = TensorCore.getDistance2d(p.pos, state.destination)\n        if not arrow or length <= 0.8 then\n            if state.arrow then Argus.deleteTimedShape(state.arrow); state.arrow = nil end\n            return\n        end\n        local heading = TensorCore.getHeadingToTarget(p.pos, state.destination)\n        local tip = math.min(0.8, length * 0.4)\n        local base = math.max(0.1, length - tip)\n        local updated = state.arrow and drawer:updateTimedArrowOnEnt(state.arrow, nil, p.id, base, 0.25, tip, 0.8, nil, 0, false, heading, true)\n        if not updated then\n            state.arrow = drawer:addTimedArrowOnEnt(remaining, p.id, base, 0.25, tip, 0.8, nil, 0, false, heading, true)\n        end\n    end\n    data.kaptinZeleniaBaits = s\nend\ns.selected = s.selected or {}\ns.nearDrawer = s.nearDrawer or TensorCore.getStaticDrawer(GUI:ColorConvertFloat4ToU32(1, 0.15, 0.15, 0.35))\ns.farDrawer = s.farDrawer or TensorCore.getStaticDrawer(GUI:ColorConvertFloat4ToU32(0.1, 0.45, 1, 0.35))\nfor key, uuid in pairs(s.draws) do Argus.deleteTimedShape(uuid); s.draws[key] = nil end\nfor i = #s.orders, 1, -1 do s.orders[i] = nil end\nfor i = #s.players, 1, -1 do s.players[i] = nil end\nfor _, entity in pairs(TensorCore.getEntityGroupList(\"Party\", { noAliveCheck = true }) or {}) do\n    s.players[#s.players + 1] = { id = entity.id, distance = 0 }\nend\ns.clearGuide(s)\ns.clocks = s.clocks or { MT=math.pi, R2=3*math.pi/4, H2=math.pi/2, M2=math.pi/4,\n    OT=0, M1=-math.pi/4, H1=-math.pi/2, R1=-3*math.pi/4 }\ns.lastWaveHit = nil\ns.lastCueAt = nil\ns.boss = eventArgs.entityID\ns.wave = 1\ns.hits = 0\ns.active = true\ns.showAt = Now() + eventArgs.channelTimeMax * 1000 - 3500\ns.firstHitAt = Now() + eventArgs.channelTimeMax * 1000 + 500\ns.endAt = Now() + eventArgs.channelTimeMax * 1000 + 11200\nself.used = true",
 							conditions = 
 							{
 								
@@ -560,7 +571,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "local s = data.kaptinZeleniaBaits\nif s and s.active and #s.orders < 4 and s.boss == eventArgs.primaryEntityID then\n    s.orders[#s.orders + 1] = true\nend\nself.used = true",
+							actionLua = "local s = data.kaptinZeleniaBaits\nif s and s.active and #s.orders < 4 and s.boss == eventArgs.primaryEntityID\n    and (not s.lastCueAt or Now()-s.lastCueAt > 1000) then\n    s.lastCueAt = Now()\n    s.orders[#s.orders + 1] = true\nend\nself.used = true",
 							conditions = 
 							{
 								
@@ -615,7 +626,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "local s = data.kaptinZeleniaBaits\nif s and s.active and #s.orders < 4 and s.boss == eventArgs.primaryEntityID then\n    s.orders[#s.orders + 1] = false\nend\nself.used = true",
+							actionLua = "local s = data.kaptinZeleniaBaits\nif s and s.active and #s.orders < 4 and s.boss == eventArgs.primaryEntityID\n    and (not s.lastCueAt or Now()-s.lastCueAt > 1000) then\n    s.lastCueAt = Now()\n    s.orders[#s.orders + 1] = false\nend\nself.used = true",
 							conditions = 
 							{
 								
@@ -670,7 +681,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "local s = data.kaptinZeleniaBaits\nif s and s.active then\n    s.hits = s.hits + 1\n    if s.hits % 4 == 0 then\n        s.wave = s.wave + 1\n        for id, uuid in pairs(s.draws) do Argus.deleteTimedShape(uuid); s.draws[id] = nil end\n        if s.wave > 4 then s.active = false end\n    end\nend\nself.used = true",
+							actionLua = "local s = data.kaptinZeleniaBaits\nlocal now = Now()\n-- One wave emits several helper events; each wave is ~3.1s apart.\nif s and s.active and (not s.lastWaveHit or now-s.lastWaveHit > 1000) then\n    s.lastWaveHit = now\n    s.wave = s.wave + 1\n    for id, uuid in pairs(s.draws) do Argus.deleteTimedShape(uuid); s.draws[id] = nil end\n    s.clearGuide(s)\n    if s.wave > 4 then s.active = false end\nend\nself.used = true",
 							conditions = 
 							{
 								
@@ -679,7 +690,7 @@ local tbl =
 									true,
 								},
 							},
-							name = "Advance after four cones",
+							name = "Advance once per resolved bait wave",
 							uuid = "e2fc0690-9c16-33f8-a0b3-29f74cc05841",
 							version = 2.1,
 						},
@@ -729,7 +740,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "data.kaptinZeleniaFloor = data.kaptinZeleniaFloor or { red = {}, ready = false, version = 0 }\nlocal f = data.kaptinZeleniaFloor\nf.known = f.known or {}\nf.eventKnown = f.eventKnown or {}\nfor i = 0, 15 do\n    f.red[i] = false\n    f.known[i] = false\n    f.eventKnown[i] = false\nend\nf.ready = false\nf.knownCount = 0\nf.readAfter = nil\nf.readUntil = Now() + 30000\nf.settleUntil = nil\nf.initialClosed = false\nf.resourceReadStatus = \"waiting_activation\"\nf.resourceSamples = 0\nf.version = f.version + 1\nlocal s = data.kaptinZeleniaRoses\nif not s then\n    s = { markers = {}, towers = {}, ground = {}, pair = { MT = 1, R1 = 1, H2 = 2, R2 = 2, OT = 3, M2 = 3, H1 = 4, M1 = 4 } }\n    function s.tilePosition(tile, radius)\n        local h = (157.5 - 45 * (tile % 8)) * math.pi / 180\n        return 100 + radius * math.sin(h), 100 + radius * math.cos(h)\n    end\n    function s.anchor(floor)\n        local anchor\n        for i = 0, 7 do\n            if not floor.red[i] and floor.red[(i+7)%8] and floor.red[(i+1)%8] then\n                if anchor ~= nil then return nil end\n                anchor = i\n            end\n        end\n        return anchor\n    end\n    function s.clearGuide(state)\n        if state.dot then Argus.deleteTimedShape(state.dot); state.dot = nil end\n        if state.arrow then Argus.deleteTimedShape(state.arrow); state.arrow = nil end\n        state.lastKey = nil\n    end\n    function s.guide(state, key, x, z, duration, arrow)\n        if state.lastKey == key then return end\n        state.clearGuide(state)\n        local p = TensorCore.mGetPlayer()\n        local drawer = TensorCore.getStaticDrawer(0xFF50FF50)\n        state.dot = drawer:addTimedCircle(duration, x, p.pos.y, z, 0.45, 0, false, true)\n        if arrow then\n            state.destination = state.destination or {x=0,y=0,z=0}\n            state.destination.x, state.destination.y, state.destination.z = x, p.pos.y, z\n            local heading = TensorCore.getHeadingToTarget(p.pos, state.destination)\n            local length = TensorCore.getDistance2d(p.pos, state.destination)\n            if length > 1 then state.arrow = drawer:addTimedArrow(duration, p.pos.x, p.pos.y, p.pos.z, heading, math.max(0.1,length-1), 0.25, 1, 1) end\n        end\n        state.lastKey = key\n    end\n    data.kaptinZeleniaRoses = s\nend\ns.clearGuide(s)\nfor k in pairs(s.markers) do s.markers[k] = nil end\nfor k in pairs(s.towers) do s.towers[k] = nil end\nfor k in pairs(s.ground) do s.ground[k] = nil end\ns.stage = eventArgs.spellID == 43193 and 1 or eventArgs.spellID - 43538\ns.markerReadyAt = nil\ns.roseDropped = false\ns.anchorTile = nil\ns.thornsActive = false\ns.thornsMove = false\ns.groundSouth = nil\nself.used = true",
+							actionLua = "data.kaptinZeleniaFloor = data.kaptinZeleniaFloor or { red = {}, ready = false, version = 0 }\nlocal f = data.kaptinZeleniaFloor\nf.known = f.known or {}\nf.eventKnown = f.eventKnown or {}\nfor i = 0, 15 do\n    f.red[i] = false\n    f.known[i] = false\n    f.eventKnown[i] = false\nend\nf.ready = false\nf.knownCount = 0\nf.readAfter = nil\nf.readUntil = Now() + 30000\nf.settleUntil = nil\nf.initialClosed = false\nf.resourceReadStatus = \"waiting_activation\"\nf.resourceSamples = 0\nf.version = f.version + 1\nlocal s = data.kaptinZeleniaRoses\nif not s then\n    s = { markers = {}, towers = {}, ground = {}, pair = { MT = 1, R1 = 1, H2 = 2, R2 = 2, OT = 3, M2 = 3, H1 = 4, M1 = 4 } }\n    function s.tilePosition(tile, radius)\n        local h = (157.5 - 45 * (tile % 8)) * math.pi / 180\n        return 100 + radius * math.sin(h), 100 + radius * math.cos(h)\n    end\n    function s.anchor(floor)\n        local anchor\n        for i = 0, 7 do\n            if not floor.red[i] and floor.red[(i+7)%8] and floor.red[(i+1)%8] then\n                if anchor ~= nil then return nil end\n                anchor = i\n            end\n        end\n        return anchor\n    end\n    -- A destination marker plus an entity-attached arrow; fixed lifetime per key.\n    function s.clearGuide(state)\n        if state.dot then Argus.deleteTimedShape(state.dot); state.dot = nil end\n        if state.arrow then Argus.deleteTimedShape(state.arrow); state.arrow = nil end\n        state.lastKey, state.guideEnd = nil, nil\n    end\n    function s.guide(state, key, x, z, duration, arrow)\n        local now = Now()\n        if duration <= 0 then state.clearGuide(state); return end\n        local p = TensorCore.mGetPlayer()\n        if not p then return end\n        local drawer = TensorCore.getStaticDrawer(0xFF50FF50)\n        if state.lastKey ~= key then\n            state.clearGuide(state)\n            state.lastKey, state.guideEnd = key, now + duration\n            state.dot = drawer:addTimedCircle(duration, x, p.pos.y, z, 0.45, 0, false, true)\n        end\n        local remaining = state.guideEnd - now\n        if remaining <= 0 then\n            if state.dot then Argus.deleteTimedShape(state.dot); state.dot = nil end\n            if state.arrow then Argus.deleteTimedShape(state.arrow); state.arrow = nil end\n            return\n        end\n        if state.dot then drawer:updateTimedCircle(state.dot, nil, x, p.pos.y, z, 0.45, 0, false, true) end\n        state.destination = state.destination or { x = 0, y = 0, z = 0 }\n        state.destination.x, state.destination.y, state.destination.z = x, p.pos.y, z\n        local length = TensorCore.getDistance2d(p.pos, state.destination)\n        if not arrow or length <= 0.8 then\n            if state.arrow then Argus.deleteTimedShape(state.arrow); state.arrow = nil end\n            return\n        end\n        local heading = TensorCore.getHeadingToTarget(p.pos, state.destination)\n        local tip = math.min(0.8, length * 0.4)\n        local base = math.max(0.1, length - tip)\n        local updated = state.arrow and drawer:updateTimedArrowOnEnt(state.arrow, nil, p.id, base, 0.25, tip, 0.8, nil, 0, false, heading, true)\n        if not updated then\n            state.arrow = drawer:addTimedArrowOnEnt(remaining, p.id, base, 0.25, tip, 0.8, nil, 0, false, heading, true)\n        end\n    end\n    data.kaptinZeleniaRoses = s\nend\ns.clearGuide(s)\nfor k in pairs(s.markers) do s.markers[k] = nil end\nfor k in pairs(s.towers) do s.towers[k] = nil end\nfor k in pairs(s.ground) do s.ground[k] = nil end\ns.stage = eventArgs.spellID == 43193 and 1 or eventArgs.spellID - 43538\ns.markerReadyAt = nil\ns.roseDropped = false\ns.anchorTile = nil\ns.thornsActive = false\ns.thornsMove = false\ns.chainEnd = nil\ns.groundSouth = nil\nself.used = true",
 							conditions = 
 							{
 								
@@ -1236,7 +1247,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "local s = data.kaptinZeleniaRoses\nif s and s.stage == 4 and s.thornsActive and not s.thornsMove then\n    s.thornsMove = true\n    s.clearGuide(s)\n    local role = KaptinZeleniaConfig and KaptinZeleniaConfig.role\n    local west = role == \"MT\" or role == \"OT\" or role == \"H1\" or role == \"H2\"\n    local east = role == \"M1\" or role == \"M2\" or role == \"R1\" or role == \"R2\"\n    if west or east then\n        local p = TensorCore.mGetPlayer()\n        local heading = west and -math.pi/2 or math.pi/2\n        s.arrow = TensorCore.getStaticDrawer(0xFF50FF50):addTimedArrow(6000, p.pos.x, p.pos.y, p.pos.z, heading, 10, 0.35, 1.2, 1.2)\n    end\nend\nself.used = true",
+							actionLua = "local s = data.kaptinZeleniaRoses\nlocal p = TensorCore.mGetPlayer()\nif s and s.stage == 4 and s.thornsActive and not s.thornsMove and p\n    and (eventArgs.sourceEntityID == p.id or eventArgs.newTargetID == p.id) then\n    s.thornsMove = true\n    s.chainEnd = Now() + 6500\n    s.clearGuide(s)\nend\nself.used = true",
 							conditions = 
 							{
 								
@@ -1245,7 +1256,7 @@ local tbl =
 									true,
 								},
 							},
-							name = "Switch to chain-break direction",
+							name = "Start movement when my chain attaches",
 							uuid = "025da68e-815d-ad3e-bb18-35f1c0e9b195",
 							version = 2.1,
 						},
@@ -1351,7 +1362,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "local old = eventArgs.oldData\nif old then\n    local timed = old.kaptinZeleniaTimedDraws\n    if timed then\n        for _, id in pairs(timed) do if id then Argus.deleteTimedShape(id) end end\n    end\n    local tethers = old.kaptinZeleniaTethers\n    if tethers then\n        for _, id in pairs(tethers) do if id then Argus.deleteTimedShape(id) end end\n    end\n    local baits = old.kaptinZeleniaBaits\n    if baits and baits.draws then\n        for _, id in pairs(baits.draws) do if id then Argus.deleteTimedShape(id) end end\n    end\n    local roses = old.kaptinZeleniaRoses\n    if roses then\n        if roses.dot then Argus.deleteTimedShape(roses.dot) end\n        if roses.arrow then Argus.deleteTimedShape(roses.arrow) end\n    end\nend\nself.used = true",
+							actionLua = "local old = eventArgs.oldData\nif old then\n    local timed = old.kaptinZeleniaTimedDraws\n    if timed then\n        for _, id in pairs(timed) do if id then Argus.deleteTimedShape(id) end end\n    end\n    local tethers = old.kaptinZeleniaTethers\n    if tethers then\n        for _, id in pairs(tethers) do if id then Argus.deleteTimedShape(id) end end\n    end\n    local baits = old.kaptinZeleniaBaits\n    if baits and baits.draws then\n        for _, id in pairs(baits.draws) do if id then Argus.deleteTimedShape(id) end end\n    end\n    if baits then\n        if baits.dot then Argus.deleteTimedShape(baits.dot) end\n        if baits.arrow then Argus.deleteTimedShape(baits.arrow) end\n    end\n    local puddles = old.kaptinZeleniaPuddles\n    if puddles then\n        if puddles.dot then Argus.deleteTimedShape(puddles.dot) end\n        if puddles.arrow then Argus.deleteTimedShape(puddles.arrow) end\n    end\n    local roses = old.kaptinZeleniaRoses\n    if roses then\n        if roses.dot then Argus.deleteTimedShape(roses.dot) end\n        if roses.arrow then Argus.deleteTimedShape(roses.arrow) end\n    end\nend\nself.used = true",
 							name = "Delete owned draw handles",
 							uuid = "a6d694a0-a776-30d6-82a3-8388e356c53d",
 							version = 2.1,
@@ -1445,12 +1456,12 @@ local tbl =
 				{
 				},
 				displayPath = "Kaptin Draws",
-				eventType = 12,
 				execute = "local states = data.kaptinZeleniaSpecterAim\nlocal draws = data.kaptinZeleniaTethers\nif not states or next(states) == nil then self.used = true; return end\nlocal now = Now()\nif now < (data.kaptinZeleniaSpecterNextUpdate or 0) then self.used = true; return end\ndata.kaptinZeleniaSpecterNextUpdate = now + 100\nlocal drawer = TensorCore.getMoogleDrawer()\nfor id, s in pairs(states) do\n    if now >= s.expires then\n        if draws[id] then Argus.deleteTimedShape(draws[id]); draws[id] = nil end\n        states[id] = nil\n    elseif not s.helper and not s.frozen then\n        local boss = TensorCore.mGetEntity(s.bossID)\n        local target = TensorCore.mGetEntity(id)\n        if boss and target then\n            local p, q = boss.pos, target.pos\n            local h = math.atan2(q.x - p.x, q.z - p.z)\n            local remaining = math.ceil(s.expires - now)\n            if not draws[id] or not drawer:updateTimedConeOnEnt(draws[id], nil, s.bossID, 48, math.pi / 3, nil, 0, nil, true, h, true) then\n                draws[id] = drawer:addTimedConeOnEnt(remaining, s.bossID, 48, math.pi / 3, nil, 0, nil, true, h, true)\n            end\n        end\n    end\nend\nself.used = true",
 				executeType = 2,
 				loop = true,
 				mechanicTime = 11.4,
 				name = "Specter - Follow full length cones",
+				throttleTime = 100,
 				timeRange = true,
 				timelineIndex = 1,
 				timerEndOffset = 248.6,
@@ -1878,7 +1889,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "-- Hector Thunder guidance. Geometry from public Ex4Zelenia encounter definitions.\ndata.kaptinZeleniaThunder = data.kaptinZeleniaThunder or {}\nlocal s = data.kaptinZeleniaThunder\nif not s.initialized or s.laneVersion~=2 then\n if s.dot then Argus.deleteTimedShape(s.dot); s.dot=nil end\n if s.initialized then s.rotation=nil end\n s.initialized,s.laneVersion = true,2\n s.mode,s.expires,s.lastGoal,s.lastAt = nil,nil,nil,nil\n s.casts, s.rotators, s.nodes, s.tiles = {}, {}, {}, {}\n s.rotatorAliases,s.rotatorAliasCount = {},0\n s.pending, s.frames, s.costs = {}, {}, {}\n s.drawer = TensorCore.getStaticDrawer(GUI:ColorConvertFloat4ToU32(0.15,1,0.2,0.9))\n function s.clearDot(st)\n  if st.dot then Argus.deleteTimedShape(st.dot); st.dot = nil end\n end\n function s.clearRotators(st)\n  for k in pairs(st.rotators) do st.rotators[k]=nil end\n  for k in pairs(st.rotatorAliases) do st.rotatorAliases[k]=nil end\n  st.rotatorAliasCount=0\n end\n function s.registerRotator(st,entityID,p,at)\n  local c=st.rotatorAliases[entityID]\n  if c then\n   if c.hits~=0 then return false end\n  else\n   if #st.rotators>=3 then return false end\n   c={}\n   st.rotators[#st.rotators+1]=c\n   st.rotatorAliases[entityID]=c\n   st.rotatorAliasCount=st.rotatorAliasCount+1\n  end\n  c.x,c.z,c.y,c.a,c.at,c.hits=p.x,p.z,p.y,p.h,at,0\n  return true\n end\n function s.laneMatches(st,c,id,a,now)\n  if not c or c.hits>=15 or math.abs(now-c.at)>500 then return false end\n  if (id==43199 and c.hits~=0) or (id==43064 and c.hits==0) then return false end\n  if c.hits>0 and not st.rotation then return false end\n  local expected=c.a+(c.hits>0 and st.rotation or 0)\n  local delta=(a-expected+math.pi)%(2*math.pi)-math.pi\n  return math.abs(delta)<=math.pi/180\n end\n function s.recordRotator(st,entityID,id,a,now)\n  if st.mode~=\"rotate\" then return false end\n  local c=st.rotatorAliases[entityID]\n  if not st.laneMatches(st,c,id,a,now) then\n   c=nil\n   for _,candidate in ipairs(st.rotators) do\n    if st.laneMatches(st,candidate,id,a,now) then\n     if c then return false end\n     c=candidate\n    end\n   end\n  end\n  if not c then return false end\n  if not st.rotatorAliases[entityID] then\n   if st.rotatorAliasCount>=6 then return false end\n   st.rotatorAliasCount=st.rotatorAliasCount+1\n  end\n  st.rotatorAliases[entityID]=c\n  c.a,c.hits,c.at=a,c.hits+1,now+1000\n  st.dirty=true\n  return true\n end\n function s.reset(st, bloom)\n  st.clearDot(st)\n  for k in pairs(st.casts) do st.casts[k] = nil end\n  st.clearRotators(st)\n  st.mode, st.expires, st.rotation, st.lastGoal, st.stageAt = nil, nil, nil, nil, nil\n  st.bloom, st.hadImpact, st.firstRadial = bloom, false, nil\n  st.dirty, st.floorVersion = true, nil\n end\n function s.shape(h, x, z, a, lo, hi, half, kind)\n  h.x,h.z,h.lo,h.hi,h.kind = x,z,lo,hi,kind\n  h.sx,h.sz,h.cs = math.sin(a),math.cos(a),math.cos(half)\n  h.ex1,h.ez1 = math.sin(a-half),math.cos(a-half)\n  h.ex2,h.ez2 = math.sin(a+half),math.cos(a+half)\n end\n function s.distance2(x,z,h)\n  x,z = x-h.x,z-h.z\n  local f = x*h.sx+z*h.sz\n  if h.kind == \"rect\" then\n   local side = math.max(math.abs(x*h.sz-z*h.sx)-4,0)\n   local along = math.max(-f,f-40,0)\n   return side*side+along*along\n  end\n  local r = math.sqrt(x*x+z*z)\n  if f >= r*h.cs-0.000000001 then\n   local d = math.max(h.lo-r,r-h.hi,0)\n   return d*d\n  end\n  local t1 = math.max(h.lo,math.min(h.hi,x*h.ex1+z*h.ez1))\n  local t2 = math.max(h.lo,math.min(h.hi,x*h.ex2+z*h.ez2))\n  local x1,z1 = x-t1*h.ex1,z-t1*h.ez1\n  local x2,z2 = x-t2*h.ex2,z-t2*h.ez2\n  return math.min(x1*x1+z1*z1,x2*x2+z2*z2)\n end\n for tile=0,15 do\n  local h = {}\n  s.shape(h,100,100,math.rad(157.5-45*(tile%8)),tile<8 and 0 or 8,tile<8 and 8 or 16,math.pi/8)\n  s.tiles[tile] = h\n  local radius = tile<8 and 6.7 or 9.3\n  for offset=-15,15,5 do\n   local a = math.rad(157.5-45*(tile%8)+offset)\n   s.nodes[#s.nodes+1] = {x=100+radius*math.sin(a),z=100+radius*math.cos(a),tile=tile,edges={}}\n  end\n end\n for stage=1,15 do\n  s.frames[stage] = {count=0,hazards={}}\n  s.costs[stage] = {}\n  for h=1,12 do s.frames[stage].hazards[h] = {} end\n end\n function s.floorClear(st,floor,x,z,margin)\n  local dx,dz = x-100,z-100\n  local radius = math.sqrt(dx*dx+dz*dz)\n  if radius<2+margin or radius>16-margin then return false end\n  local m2=margin*margin\n  for tile=0,15 do\n   if floor.red[tile] and st.distance2(x,z,st.tiles[tile])<m2 then return false end\n  end\n  return true\n end\n function s.edgeClear(st,floor,a,b)\n  local dx,dz = b.x-a.x,b.z-a.z\n  local count=math.max(1,math.ceil(math.sqrt(dx*dx+dz*dz)/0.5))\n  for k=0,count do\n   local t=k/count\n   if not st.floorClear(st,floor,a.x+t*dx,a.z+t*dz,0.4) then return false end\n  end\n  return true\n end\n function s.rebuildFloor(st,floor)\n  for _,n in ipairs(st.nodes) do\n   n.allowed = not floor.red[n.tile] and st.floorClear(st,floor,n.x,n.z,0.6)\n   for k=#n.edges,1,-1 do n.edges[k]=nil end\n  end\n  for i,a in ipairs(st.nodes) do\n   if a.allowed then\n    for j,b in ipairs(st.nodes) do\n     if b.allowed then\n      local dx,dz=b.x-a.x,b.z-a.z\n      local d2=dx*dx+dz*dz\n      if d2<=36 and st.edgeClear(st,floor,a,b) then\n       a.edges[#a.edges+1]={index=j,d2=d2}\n      end\n     end\n    end\n   end\n  end\n  st.floorVersion=floor.version\n end\n function s.pendingLess(a,b) return a.at<b.at end\n function s.buildFrames(st,now)\n  for i=1,15 do st.frames[i].count=0 end\n  if st.mode==\"rotate\" then\n   if not st.rotation then return 0 end\n   local n,hits,first=0,nil,math.huge\n   local last=0\n   for _,c in ipairs(st.rotators) do\n    n=n+1\n    if hits and hits~=c.hits then return 0 end\n    hits=c.hits\n    first=math.min(first,c.at); last=math.max(last,c.at)\n   end\n   if n~=3 or not hits or hits>=15 or last-first>250 or now>first+250 then return 0 end\n   for stage=1,15-hits do\n    local frame=st.frames[stage]\n    frame.at=first+(stage-1)*1000\n    for _,c in ipairs(st.rotators) do\n     frame.count=frame.count+1\n     st.shape(frame.hazards[frame.count],c.x,c.z,c.a+st.rotation*(stage-1+(hits>0 and 1 or 0)),0,24,math.pi/8)\n    end\n   end\n   return 15-hits\n  end\n  for k=#st.pending,1,-1 do st.pending[k]=nil end\n  local slash=0\n  for _,c in pairs(st.casts) do\n   if not c.done then\n    if now>c.at+250 then return 0 end\n    st.pending[#st.pending+1]=c\n    if c.id==43216 then slash=slash+1 end\n   end\n  end\n  if slash==0 or not st.firstRadial or #st.pending>12 then return 0 end\n  table.sort(st.pending,st.pendingLess)\n  local count=0\n  for _,c in ipairs(st.pending) do\n   if count==0 or c.at-st.frames[count].at>250 then\n    count=count+1\n    st.frames[count].at=c.at\n   end\n   local f=st.frames[count]\n   f.count=f.count+1\n   st.shape(f.hazards[f.count],c.x,c.z,c.a,c.id==43451 and 8 or 0,c.id==43450 and 8 or 24,c.id==43216 and math.pi/6 or math.pi,c.id==43210 and \"rect\" or nil)\n  end\n  return count\n end\n function s.stageSafe(st,node,frame)\n  if not node.allowed then return false end\n  for h=1,frame.count do\n   if st.distance2(node.x,node.z,frame.hazards[h])<0.36 then return false end\n  end\n  return true\n end\n function s.solve(st,floor,count,player)\n  if st.floorVersion~=floor.version then st.rebuildFloor(st,floor) end\n  -- Backward feasibility prevents the rotating cones trapping guidance in a short safe pocket.\n  for stage=count,1,-1 do\n   local frame,cost=st.frames[stage],st.costs[stage]\n   local budget=stage<count and math.min(6,math.max(0,(st.frames[stage+1].at-frame.at)/1000*4)) or 0\n   for i,node in ipairs(st.nodes) do\n    local best=math.huge\n    if st.stageSafe(st,node,frame) then\n     if stage==count then best=0\n     else\n      for _,edge in ipairs(node.edges) do\n       if edge.d2<=budget*budget then\n        local candidate=st.costs[stage+1][edge.index]+edge.d2\n        if candidate<best then best=candidate end\n       end\n      end\n     end\n    end\n    cost[i]=best\n   end\n  end\n  local targetTile,anchorX,anchorZ\n  if st.mode==\"slash\" and st.bloom==43540 and not st.hadImpact then\n   local offset=st.firstRadial==43450 and 8 or 0\n   for j=0,7 do\n    if (j==1 or j==2 or j==5 or j==6) and not floor.red[j+offset] then\n     local previous=(j+7)%8\n     local following=(j+1)%8\n     local prevSafe=(previous==1 or previous==2 or previous==5 or previous==6) and not floor.red[previous+offset]\n     local nextSafe=(following==1 or following==2 or following==5 or following==6) and not floor.red[following+offset]\n     if not prevSafe and not nextSafe then\n      if targetTile then return nil end\n      targetTile=j+offset\n     end\n    end\n   end\n   if not targetTile then return nil end\n   local j=targetTile%8\n   local a=math.rad(157.5-45*j+(j<4 and 15 or -15))\n   local r=targetTile<8 and 6.7 or 9.3\n   anchorX,anchorZ=100+r*math.sin(a),100+r*math.cos(a)\n  elseif st.lastGoal then\n   anchorX,anchorZ=st.lastGoal.x,st.lastGoal.z\n  else\n   anchorX,anchorZ=player.x,player.z\n  end\n  local winner,best=nil,math.huge\n  for i,n in ipairs(st.nodes) do\n   local reachable=true\n   if st.lastGoal and st.lastAt and st.frames[1].at>st.lastAt+250 then\n    local move=math.min(6,4*(st.frames[1].at-st.lastAt)/1000)\n    local mx,mz=n.x-st.lastGoal.x,n.z-st.lastGoal.z\n    reachable=mx*mx+mz*mz<=move*move and st.edgeClear(st,floor,st.lastGoal,n)\n   end\n   if reachable and st.costs[1][i]<math.huge and (not targetTile or n.tile==targetTile) then\n    local dx,dz=n.x-anchorX,n.z-anchorZ\n    local px,pz=n.x-player.x,n.z-player.z\n    local value=dx*dx+dz*dz+0.03*(px*px+pz*pz)+0.08*st.costs[1][i]\n    if value<best then best,winner=value,n end\n   end\n  end\n  return winner\n end\nend\n\n-- Hector's two Thunder II patterns each have a three-tile inner corridor.\n-- These are conservative allowed regions, not inferred complete floor masks.\nif not s.knownFloors then\n s.knownFloors={cw={red={},ready=true,version=-101,conservative=true},ccw={red={},ready=true,version=-102,conservative=true}}\n for tile=0,15 do\n  s.knownFloors.cw.red[tile]=not (tile>=2 and tile<=4)\n  s.knownFloors.ccw.red[tile]=not (tile>=5 and tile<=7)\n end\n function s.knownFloor(st,observed)\n  local floor\n  if st.mode==\"rotate\" and st.bloom==43193 and #st.rotators==3 and st.rotation then\n   local clockwise=st.rotation<0\n   local base=math.rad(clockwise and 37.5 or -7.5)\n   local mask=0\n   for _,c in ipairs(st.rotators) do\n    local initial=c.a-st.rotation*math.max(0,c.hits-1)\n    local index\n    for lane=0,2 do\n     local delta=(initial-base-lane*2*math.pi/3+math.pi)%(2*math.pi)-math.pi\n     if math.abs(delta)<=math.pi/180 then index=lane end\n    end\n    if index==nil then return nil end\n    local bit=2^index\n    if math.floor(mask/bit)%2==1 then return nil end\n    mask=mask+bit\n   end\n   if mask~=7 then return nil end\n   floor=clockwise and st.knownFloors.cw or st.knownFloors.ccw\n\n  end\n  if floor and observed then\n   for tile=0,15 do\n    if not floor.red[tile] and observed.red[tile] then return nil end\n   end\n  end\n  return floor\n end\nend\n\nlocal id,now = eventArgs.spellID,Now()\nif id==43193 or id==43540 or id==43541 or id==43542 or id==43543 or id==43544 then\n s.reset(s,id)\n if id==43540 then\n  -- Stage only if observed floor data confirms WNW; Slash reveals its radial order later.\n  s.mode,s.stageAt,s.expires=\"slashStage\",now+eventArgs.channelTimeMax*1000+1300,now+10000\n end\nelseif id==43235 then\n s.clearDot(s); s.mode=nil\nelseif id==43198 then\n s.clearDot(s)\n s.clearRotators(s)\n s.mode,s.expires,s.lastGoal,s.lastAt=\"rotate\",now+26000,nil,nil\n s.dirty=true\nelseif id==43448 or id==43449 then\n s.clearDot(s)\n for k,c in pairs(s.casts) do if c.id~=43210 or c.done then s.casts[k]=nil end end\n s.mode,s.expires,s.lastGoal,s.lastAt=\"slash\",now+18000,nil,nil\n s.firstRadial,s.hadImpact=nil,false\n s.dirty=true\nelseif id==43199 or id==43216 or id==43450 or id==43451 or id==43210 then\n local entity=TensorCore.mGetEntity(eventArgs.entityID)\n if entity and entity.pos and eventArgs.channelTimeMax>0 then\n  local p=entity.pos\n  if id==43199 and s.mode==\"rotate\" then\n   s.registerRotator(s,eventArgs.entityID,p,now+eventArgs.channelTimeMax*1000)\n  elseif id~=43199 then\n   s.casts[eventArgs.entityID]={id=id,x=p.x,z=p.z,y=p.y,a=p.h,at=now+eventArgs.channelTimeMax*1000,done=false}\n   if id==43450 or id==43451 then s.firstRadial=s.firstRadial or id end\n  end\n  s.dirty=true\n end\nend\ns.lastEvent=now\nself.used=true",
+							actionLua = "-- Hector Thunder guidance. Geometry from public Ex4Zelenia encounter definitions.\ndata.kaptinZeleniaThunder = data.kaptinZeleniaThunder or {}\nlocal s = data.kaptinZeleniaThunder\nif not s.initialized or s.laneVersion~=2 then\n if s.dot then Argus.deleteTimedShape(s.dot); s.dot=nil end\n if s.initialized then s.rotation=nil end\n s.initialized,s.laneVersion = true,2\n s.mode,s.expires,s.lastGoal,s.lastAt = nil,nil,nil,nil\n s.casts, s.rotators, s.nodes, s.tiles = {}, {}, {}, {}\n s.rotatorAliases,s.rotatorAliasCount = {},0\n s.pending, s.frames, s.costs = {}, {}, {}\n s.drawer = TensorCore.getStaticDrawer(GUI:ColorConvertFloat4ToU32(0.15,1,0.2,0.9))\n function s.clearDot(st)\n  if st.dot then Argus.deleteTimedShape(st.dot); st.dot = nil end\n end\n function s.clearRotators(st)\n  for k in pairs(st.rotators) do st.rotators[k]=nil end\n  for k in pairs(st.rotatorAliases) do st.rotatorAliases[k]=nil end\n  st.rotatorAliasCount=0\n end\n function s.registerRotator(st,entityID,p,at)\n  local c=st.rotatorAliases[entityID]\n  if c then\n   if c.hits~=0 then return false end\n  else\n   if #st.rotators>=3 then return false end\n   c={}\n   st.rotators[#st.rotators+1]=c\n   st.rotatorAliases[entityID]=c\n   st.rotatorAliasCount=st.rotatorAliasCount+1\n  end\n  c.x,c.z,c.y,c.a,c.at,c.hits=p.x,p.z,p.y,p.h,at,0\n  return true\n end\n function s.laneMatches(st,c,id,a,now)\n  if not c or c.hits>=15 or math.abs(now-c.at)>500 then return false end\n  if (id==43199 and c.hits~=0) or (id==43064 and c.hits==0) then return false end\n  if c.hits>0 and not st.rotation then return false end\n  local expected=c.a+(c.hits>0 and st.rotation or 0)\n  local delta=(a-expected+math.pi)%(2*math.pi)-math.pi\n  return math.abs(delta)<=math.pi/180\n end\n function s.recordRotator(st,entityID,id,a,now)\n  if st.mode~=\"rotate\" then return false end\n  local c=st.rotatorAliases[entityID]\n  if not st.laneMatches(st,c,id,a,now) then\n   c=nil\n   for _,candidate in ipairs(st.rotators) do\n    if st.laneMatches(st,candidate,id,a,now) then\n     if c then return false end\n     c=candidate\n    end\n   end\n  end\n  if not c then return false end\n  if not st.rotatorAliases[entityID] then\n   if st.rotatorAliasCount>=6 then return false end\n   st.rotatorAliasCount=st.rotatorAliasCount+1\n  end\n  st.rotatorAliases[entityID]=c\n  c.a,c.hits,c.at=a,c.hits+1,now+1000\n  st.dirty=true\n  return true\n end\n function s.reset(st, bloom)\n  st.clearDot(st)\n  for k in pairs(st.casts) do st.casts[k] = nil end\n  st.clearRotators(st)\n  st.mode, st.expires, st.rotation, st.lastGoal, st.stageAt = nil, nil, nil, nil, nil\n  st.bloom, st.hadImpact, st.firstRadial = bloom, false, nil\n  st.dirty, st.floorVersion = true, nil\n end\n function s.shape(h, x, z, a, lo, hi, half, kind)\n  h.x,h.z,h.lo,h.hi,h.kind = x,z,lo,hi,kind\n  h.sx,h.sz,h.cs = math.sin(a),math.cos(a),math.cos(half)\n  h.ex1,h.ez1 = math.sin(a-half),math.cos(a-half)\n  h.ex2,h.ez2 = math.sin(a+half),math.cos(a+half)\n end\n function s.distance2(x,z,h)\n  x,z = x-h.x,z-h.z\n  local f = x*h.sx+z*h.sz\n  if h.kind == \"rect\" then\n   local side = math.max(math.abs(x*h.sz-z*h.sx)-4,0)\n   local along = math.max(-f,f-40,0)\n   return side*side+along*along\n  end\n  local r = math.sqrt(x*x+z*z)\n  if f >= r*h.cs-0.000000001 then\n   local d = math.max(h.lo-r,r-h.hi,0)\n   return d*d\n  end\n  local t1 = math.max(h.lo,math.min(h.hi,x*h.ex1+z*h.ez1))\n  local t2 = math.max(h.lo,math.min(h.hi,x*h.ex2+z*h.ez2))\n  local x1,z1 = x-t1*h.ex1,z-t1*h.ez1\n  local x2,z2 = x-t2*h.ex2,z-t2*h.ez2\n  return math.min(x1*x1+z1*z1,x2*x2+z2*z2)\n end\n for tile=0,15 do\n  local h = {}\n  s.shape(h,100,100,math.rad(157.5-45*(tile%8)),tile<8 and 0 or 8,tile<8 and 8 or 16,math.pi/8)\n  s.tiles[tile] = h\n  local radius = tile<8 and 6.7 or 9.3\n  for offset=-15,15,5 do\n   local a = math.rad(157.5-45*(tile%8)+offset)\n   s.nodes[#s.nodes+1] = {x=100+radius*math.sin(a),z=100+radius*math.cos(a),tile=tile,edges={}}\n  end\n end\n for stage=1,15 do\n  s.frames[stage] = {count=0,hazards={}}\n  s.costs[stage] = {}\n  for h=1,12 do s.frames[stage].hazards[h] = {} end\n end\n function s.floorClear(st,floor,x,z,margin)\n  local dx,dz = x-100,z-100\n  local radius = math.sqrt(dx*dx+dz*dz)\n  if radius<2+margin or radius>16-margin then return false end\n  local m2=margin*margin\n  for tile=0,15 do\n   if floor.red[tile] and st.distance2(x,z,st.tiles[tile])<m2 then return false end\n  end\n  return true\n end\n function s.edgeClear(st,floor,a,b)\n  local dx,dz = b.x-a.x,b.z-a.z\n  local count=math.max(1,math.ceil(math.sqrt(dx*dx+dz*dz)/0.5))\n  for k=0,count do\n   local t=k/count\n   if not st.floorClear(st,floor,a.x+t*dx,a.z+t*dz,0.4) then return false end\n  end\n  return true\n end\n function s.rebuildFloor(st,floor)\n  for _,n in ipairs(st.nodes) do\n   n.allowed = not floor.red[n.tile] and st.floorClear(st,floor,n.x,n.z,0.6)\n   for k=#n.edges,1,-1 do n.edges[k]=nil end\n  end\n  for i,a in ipairs(st.nodes) do\n   if a.allowed then\n    for j,b in ipairs(st.nodes) do\n     if b.allowed then\n      local dx,dz=b.x-a.x,b.z-a.z\n      local d2=dx*dx+dz*dz\n      if d2<=36 and st.edgeClear(st,floor,a,b) then\n       a.edges[#a.edges+1]={index=j,d2=d2}\n      end\n     end\n    end\n   end\n  end\n  st.floorVersion=floor.version\n end\n function s.pendingLess(a,b) return a.at<b.at end\n function s.buildFrames(st,now)\n  for i=1,15 do st.frames[i].count=0 end\n  if st.mode==\"rotate\" then\n   if not st.rotation then return 0 end\n   local n,hits,first=0,nil,math.huge\n   local last=0\n   for _,c in ipairs(st.rotators) do\n    n=n+1\n    if hits and hits~=c.hits then return 0 end\n    hits=c.hits\n    first=math.min(first,c.at); last=math.max(last,c.at)\n   end\n   if n~=3 or not hits or hits>=15 or last-first>250 or now>first+250 then return 0 end\n   for stage=1,15-hits do\n    local frame=st.frames[stage]\n    frame.at=first+(stage-1)*1000\n    for _,c in ipairs(st.rotators) do\n     frame.count=frame.count+1\n     st.shape(frame.hazards[frame.count],c.x,c.z,c.a+st.rotation*(stage-1+(hits>0 and 1 or 0)),0,24,math.pi/8)\n    end\n   end\n   return 15-hits\n  end\n  for k=#st.pending,1,-1 do st.pending[k]=nil end\n  local slash=0\n  for _,c in pairs(st.casts) do\n   if not c.done then\n    if now>c.at+250 then return 0 end\n    st.pending[#st.pending+1]=c\n    if c.id==43216 then slash=slash+1 end\n   end\n  end\n  if slash==0 or not st.firstRadial or #st.pending>12 then return 0 end\n  table.sort(st.pending,st.pendingLess)\n  local count=0\n  for _,c in ipairs(st.pending) do\n   if count==0 or c.at-st.frames[count].at>250 then\n    count=count+1\n    st.frames[count].at=c.at\n   end\n   local f=st.frames[count]\n   f.count=f.count+1\n   st.shape(f.hazards[f.count],c.x,c.z,c.a,c.id==43451 and 8 or 0,c.id==43450 and 8 or 24,c.id==43216 and math.pi/6 or math.pi,c.id==43210 and \"rect\" or nil)\n  end\n  return count\n end\n function s.stageSafe(st,node,frame)\n  if not node.allowed then return false end\n  for h=1,frame.count do\n   if st.distance2(node.x,node.z,frame.hazards[h])<0.36 then return false end\n  end\n  return true\n end\n function s.solve(st,floor,count,player)\n  if st.floorVersion~=floor.version then st.rebuildFloor(st,floor) end\n  -- Backward feasibility prevents the rotating cones trapping guidance in a short safe pocket.\n  for stage=count,1,-1 do\n   local frame,cost=st.frames[stage],st.costs[stage]\n   local budget=stage<count and math.min(6,math.max(0,(st.frames[stage+1].at-frame.at)/1000*4)) or 0\n   for i,node in ipairs(st.nodes) do\n    local best=math.huge\n    if st.stageSafe(st,node,frame) then\n     if stage==count then best=0\n     else\n      for _,edge in ipairs(node.edges) do\n       if edge.d2<=budget*budget then\n        local candidate=st.costs[stage+1][edge.index]+edge.d2\n        if candidate<best then best=candidate end\n       end\n      end\n     end\n    end\n    cost[i]=best\n   end\n  end\n  local targetTile,anchorX,anchorZ\n  if st.mode==\"slash\" and st.bloom==43540 and not st.hadImpact then\n   local offset=st.firstRadial==43450 and 8 or 0\n   for j=0,7 do\n    if (j==1 or j==2 or j==5 or j==6) and not floor.red[j+offset] then\n     local previous=(j+7)%8\n     local following=(j+1)%8\n     local prevSafe=(previous==1 or previous==2 or previous==5 or previous==6) and not floor.red[previous+offset]\n     local nextSafe=(following==1 or following==2 or following==5 or following==6) and not floor.red[following+offset]\n     if not prevSafe and not nextSafe then\n      if targetTile then return nil end\n      targetTile=j+offset\n     end\n    end\n   end\n   if not targetTile then return nil end\n   local j=targetTile%8\n   local a=math.rad(157.5-45*j+(j<4 and 15 or -15))\n   local r=targetTile<8 and 6.7 or 9.3\n   anchorX,anchorZ=100+r*math.sin(a),100+r*math.cos(a)\n  elseif st.lastGoal then\n   anchorX,anchorZ=st.lastGoal.x,st.lastGoal.z\n  else\n   anchorX,anchorZ=player.x,player.z\n  end\n  local winner,best=nil,math.huge\n  for i,n in ipairs(st.nodes) do\n   local reachable=true\n   if st.lastGoal and st.lastAt and st.frames[1].at>st.lastAt+250 then\n    local move=math.min(6,4*(st.frames[1].at-st.lastAt)/1000)\n    local mx,mz=n.x-st.lastGoal.x,n.z-st.lastGoal.z\n    reachable=mx*mx+mz*mz<=move*move and st.edgeClear(st,floor,st.lastGoal,n)\n   end\n   if reachable and st.costs[1][i]<math.huge and (not targetTile or n.tile==targetTile) then\n    local dx,dz=n.x-anchorX,n.z-anchorZ\n    local px,pz=n.x-player.x,n.z-player.z\n    local value=dx*dx+dz*dz+0.03*(px*px+pz*pz)+0.08*st.costs[1][i]\n    if value<best then best,winner=value,n end\n   end\n  end\n  return winner\n end\nend\n\n\n-- Player-attached guidance; the solver continues to own the destination.\nif s.arrowVersion ~= 1 then\n if s.arrow then Argus.deleteTimedShape(s.arrow); s.arrow=nil end\n s.arrowGoal={x=0,z=0}\n s.arrowVersion=1\n function s.clearArrow(st)\n  if st.arrow then Argus.deleteTimedShape(st.arrow); st.arrow=nil end\n  st.arrowDrawExpires=nil\n end\n function s.clearDot(st)\n  if st.dot then Argus.deleteTimedShape(st.dot); st.dot=nil end\n  st.clearArrow(st)\n  st.arrowExpires=nil\n end\n function s.pointArrow(st,x,z,expires)\n  st.arrowGoal.x,st.arrowGoal.z=x,z\n  st.arrowExpires=expires\n end\n function s.updateArrow(st,floor,player,now)\n  if not st.arrowExpires or now>=st.arrowExpires or not player or not player.pos then\n   st.clearArrow(st); return\n  end\n  local goal=st.arrowGoal\n  local dx,dz=goal.x-player.pos.x,goal.z-player.pos.z\n  local distance=math.sqrt(dx*dx+dz*dz)\n  -- A destination dot is not proof that the straight path to it is safe.\n  -- Keep the dot but suppress an arrow through red floor or arena boundaries.\n  if distance<=1 or not st.edgeClear(st,floor,player.pos,goal) then\n   st.clearArrow(st); return\n  end\n  local heading=math.atan2(dx,dz)\n  if st.arrow and st.arrowDrawExpires~=st.arrowExpires then st.clearArrow(st) end\n  if st.arrow then\n   local ok=st.drawer:updateTimedArrowOnEnt(st.arrow,nil,player.id,distance-1,0.25,1,1,nil,0,false,heading,true)\n   if not ok then st.arrow=nil end\n  end\n  if not st.arrow then\n   st.arrow=st.drawer:addTimedArrowOnEnt(math.max(1,math.floor(st.arrowExpires-now)),player.id,distance-1,0.25,1,1,nil,0,false,heading,true)\n   st.arrowDrawExpires=st.arrowExpires\n  end\n end\nend\n\n-- Hector's two Thunder II patterns each have a three-tile inner corridor.\n-- These are conservative allowed regions, not inferred complete floor masks.\nif not s.knownFloors then\n s.knownFloors={cw={red={},ready=true,version=-101,conservative=true},ccw={red={},ready=true,version=-102,conservative=true}}\n for tile=0,15 do\n  s.knownFloors.cw.red[tile]=not (tile>=2 and tile<=4)\n  s.knownFloors.ccw.red[tile]=not (tile>=5 and tile<=7)\n end\n function s.knownFloor(st,observed)\n  local floor\n  if st.mode==\"rotate\" and st.bloom==43193 and #st.rotators==3 and st.rotation then\n   local clockwise=st.rotation<0\n   local base=math.rad(clockwise and 37.5 or -7.5)\n   local mask=0\n   for _,c in ipairs(st.rotators) do\n    local initial=c.a-st.rotation*math.max(0,c.hits-1)\n    local index\n    for lane=0,2 do\n     local delta=(initial-base-lane*2*math.pi/3+math.pi)%(2*math.pi)-math.pi\n     if math.abs(delta)<=math.pi/180 then index=lane end\n    end\n    if index==nil then return nil end\n    local bit=2^index\n    if math.floor(mask/bit)%2==1 then return nil end\n    mask=mask+bit\n   end\n   if mask~=7 then return nil end\n   floor=clockwise and st.knownFloors.cw or st.knownFloors.ccw\n\n  end\n  if floor and observed then\n   for tile=0,15 do\n    if not floor.red[tile] and observed.red[tile] then return nil end\n   end\n  end\n  return floor\n end\nend\n\nlocal id,now = eventArgs.spellID,Now()\nif id==43193 or id==43540 or id==43541 or id==43542 or id==43543 or id==43544 then\n s.reset(s,id)\n if id==43540 then\n  -- Stage only if observed floor data confirms WNW; Slash reveals its radial order later.\n  s.mode,s.stageAt,s.expires=\"slashStage\",now+eventArgs.channelTimeMax*1000+1300,now+10000\n end\nelseif id==43235 then\n s.clearDot(s); s.mode=nil\nelseif id==43198 then\n s.clearDot(s)\n s.clearRotators(s)\n s.mode,s.expires,s.lastGoal,s.lastAt=\"rotate\",now+26000,nil,nil\n s.dirty=true\nelseif id==43448 or id==43449 then\n s.clearDot(s)\n for k,c in pairs(s.casts) do if c.id~=43210 or c.done then s.casts[k]=nil end end\n s.mode,s.expires,s.lastGoal,s.lastAt=\"slash\",now+18000,nil,nil\n s.firstRadial,s.hadImpact=nil,false\n s.dirty=true\nelseif id==43199 or id==43216 or id==43450 or id==43451 or id==43210 then\n local entity=TensorCore.mGetEntity(eventArgs.entityID)\n if entity and entity.pos and eventArgs.channelTimeMax>0 then\n  local p=entity.pos\n  if id==43199 and s.mode==\"rotate\" then\n   s.registerRotator(s,eventArgs.entityID,p,now+eventArgs.channelTimeMax*1000)\n  elseif id~=43199 then\n   s.casts[eventArgs.entityID]={id=id,x=p.x,z=p.z,y=p.y,a=p.h,at=now+eventArgs.channelTimeMax*1000,done=false}\n   if id==43450 or id==43451 then s.firstRadial=s.firstRadial or id end\n  end\n  s.dirty=true\n end\nend\ns.lastEvent=now\nself.used=true",
 							conditions = 
 							{
 								
@@ -2075,7 +2086,7 @@ local tbl =
 				},
 				displayPath = "Kaptin/Hector Thunder",
 				eventType = 9,
-				execute = "local old=eventArgs.oldData and eventArgs.oldData.kaptinZeleniaThunder\nif old and old.dot then Argus.deleteTimedShape(old.dot) end\nself.used=true",
+				execute = "local old=eventArgs.oldData and eventArgs.oldData.kaptinZeleniaThunder\nif old and old.dot then Argus.deleteTimedShape(old.dot) end\nif old and old.arrow then Argus.deleteTimedShape(old.arrow) end\nself.used=true",
 				executeType = 2,
 				loop = true,
 				mechanicTime = 11.4,
@@ -2089,6 +2100,20 @@ local tbl =
 			},
 		},
 	}, 
+	[8] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "62bcedbb-832c-99d7-d909-1a05eab1084b",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
+		},
+	},
 	[9] = 
 	{
 		
@@ -2112,19 +2137,89 @@ local tbl =
 				{
 				},
 				displayPath = "Kaptin Draws",
-				eventType = 12,
-				execute = "local s = data.kaptinZeleniaBaits\nif not s or not s.active or s.wave > #s.orders or not s.showAt then self.used = true; return end\nlocal now = Now()\nif now < s.showAt or now < (s.nextUpdate or 0) then self.used = true; return end\ns.nextUpdate = now + 100\nlocal boss = TensorCore.mGetEntity(s.boss)\nif not boss or now > s.endAt then\n    for id, uuid in pairs(s.draws) do Argus.deleteTimedShape(uuid); s.draws[id] = nil end\n    s.active = false\n    self.used = true\n    return\nend\nlocal alive = 0\nfor i = 1, #s.players do\n    local entry = s.players[i]\n    local entity = TensorCore.mGetEntity(entry.id)\n    if entity and entity.alive then\n        local dx, dz = entity.pos.x - boss.pos.x, entity.pos.z - boss.pos.z\n        entry.distance = dx * dx + dz * dz\n        alive = alive + 1\n    else entry.distance = math.huge end\nend\ntable.sort(s.players, s.sortDistance)\nfor id in pairs(s.selected) do s.selected[id] = nil end\nlocal near = s.orders[s.wave]\nlocal drawer = near and s.nearDrawer or s.farDrawer\nlocal duration = s.endAt - now\nfor i = 1, math.min(4, alive) do\n    local entry = s.players[near and i or alive - i + 1]\n    local entity = TensorCore.mGetEntity(entry.id)\n    if entity then\n        s.selected[entry.id] = true\n        local heading = TensorCore.getHeadingToTarget(boss.pos, entity.pos)\n        local uuid = s.draws[entry.id]\n        local updated = uuid and drawer:updateTimedConeOnEnt(uuid, nil, s.boss, 24, math.pi/4, nil, 0, false, false, heading, true)\n        if not updated then\n            s.draws[entry.id] = drawer:addTimedConeOnEnt(duration, s.boss, 24, math.pi/4, nil, 0, false, false, heading, true)\n        end\n    end\nend\nfor id, uuid in pairs(s.draws) do\n    if not s.selected[id] then Argus.deleteTimedShape(uuid); s.draws[id] = nil end\nend\nself.used = true",
+				execute = "local s = data.kaptinZeleniaBaits\nif not s or not s.active or s.wave > #s.orders or not s.showAt then self.used = true; return end\nlocal now = Now()\nif now < s.showAt or now < (s.nextUpdate or 0) then self.used = true; return end\ns.nextUpdate = now + 100\nlocal boss = TensorCore.mGetEntity(s.boss)\nif not boss or now > s.endAt then\n    for id, uuid in pairs(s.draws) do Argus.deleteTimedShape(uuid); s.draws[id] = nil end\n    s.clearGuide(s)\n    s.active = false\n    self.used = true\n    return\nend\nlocal alive = 0\nfor i = 1, #s.players do\n    local entry = s.players[i]\n    local entity = TensorCore.mGetEntity(entry.id)\n    if entity and entity.alive then\n        local dx, dz = entity.pos.x - boss.pos.x, entity.pos.z - boss.pos.z\n        entry.distance = dx * dx + dz * dz\n        alive = alive + 1\n    else entry.distance = math.huge end\nend\ntable.sort(s.players, s.sortDistance)\nfor id in pairs(s.selected) do s.selected[id] = nil end\nlocal near = s.orders[s.wave]\nlocal drawer = near and s.nearDrawer or s.farDrawer\nlocal duration = s.endAt - now\nfor i = 1, math.min(4, alive) do\n    local entry = s.players[near and i or alive - i + 1]\n    local entity = TensorCore.mGetEntity(entry.id)\n    if entity then\n        s.selected[entry.id] = true\n        local heading = TensorCore.getHeadingToTarget(boss.pos, entity.pos)\n        local uuid = s.draws[entry.id]\n        local updated = uuid and drawer:updateTimedConeOnEnt(uuid, nil, s.boss, 24, math.pi/4, nil, 0, false, false, heading, true)\n        if not updated then\n            s.draws[entry.id] = drawer:addTimedConeOnEnt(duration, s.boss, 24, math.pi/4, nil, 0, false, false, heading, true)\n        end\n    end\nend\nfor id, uuid in pairs(s.draws) do\n    if not s.selected[id] then Argus.deleteTimedShape(uuid); s.draws[id] = nil end\nend\n\nlocal p = TensorCore.mGetPlayer()\nlocal role = KaptinZeleniaConfig and KaptinZeleniaConfig.role\nlocal h = role and s.clocks[role]\nlocal puddles = data.kaptinZeleniaPuddles\nif h and p and not (puddles and puddles.active and puddles.endAt and now < puddles.endAt) then\n    local dps = role == \"M1\" or role == \"M2\" or role == \"R1\" or role == \"R2\"\n    -- DPS starts inside regardless of the first cue. Alternate which group is hit.\n    local dpsBaits = (s.wave % 2 == 1) == s.orders[1]\n    local iBait = dps == dpsBaits\n    local goNear = iBait == s.orders[s.wave]\n    local radius = goNear and 2.5 or math.max(6,boss.hitradius+3)\n    local x,z = boss.pos.x+radius*math.sin(h), boss.pos.z+radius*math.cos(h)\n    s.guide(s,\"bait:\"..s.wave..\":\"..role,x,z,s.endAt-now,true)\nelse\n    s.clearGuide(s)\nend\nself.used = true",
 				executeType = 2,
 				loop = true,
 				mechanicTime = 65.1,
-				name = "Escelons 1 - Live bait cones",
+				name = "Escelons 1 - Baits and my position",
+				throttleTime = 100,
 				timeRange = true,
 				timelineIndex = 9,
 				timerEndOffset = 12,
-				timerStartOffset = -5,
+				timerStartOffset = -25,
 				uuid = "d2f26481-3a69-2d36-a0a9-4f3c72de443a",
 				version = 2,
 			},
+		},
+	},
+	[13] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "12447f9b-0932-cabf-d475-1a9d7f6171eb",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
+		},
+	},
+	[15] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "8afab2f1-ca66-d3ed-a0f0-842f05afa4c1",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
+		},
+	},
+	[16] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "d3b4d32a-8de1-b8f6-10b3-58ccbc36523a",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
+		},
+	},
+	[17] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "61201ddf-3c54-edfb-8a38-648137e7f16f",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
+		},
+	},
+	[23] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "c59be5fe-9a2d-3792-33ac-e61caac5c64e",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
 		},
 	},
 	[27] = 
@@ -2160,16 +2255,16 @@ local tbl =
 				{
 				},
 				displayPath = "Kaptin/Hector Thunder",
-				eventType = 12,
-				execute = "local s=data.kaptinZeleniaThunder\nif not s or not s.initialized or not s.mode then self.used=true; return end\nlocal now=Now()\n-- Bypass the queued updater; retain a 100 ms cap inside the narrow mechanic window.\nif s.dotUpdateAt and now>=s.dotUpdateAt and now-s.dotUpdateAt<100 then self.used=true; return end\ns.dotUpdateAt=now\nlocal floor=data.kaptinZeleniaFloor\n-- Thunder Slash requires the observed floor; a fixed mask can point into rose runes.\nif (not floor or not floor.ready) and s.mode==\"rotate\" and s.knownFloor then floor=s.knownFloor(s,floor) end\nif not s.expires or now>s.expires or not floor or not floor.ready then\n s.clearDot(s)\n self.used=true\n return\nend\nif s.lastEvent and now-s.lastEvent<120 then self.used=true; return end\n-- Rebuild only after a mechanic event or changed floor. A stale cast never advances itself.\nif not s.dirty and s.floorVersion==floor.version then\n if s.nextImpact and now>s.nextImpact+250 then s.clearDot(s) end\n self.used=true\n return\nend\nlocal count=s.buildFrames(s,now)\nif count==0 then s.clearDot(s); self.used=true; return end\nlocal player=TensorCore.mGetPlayer()\nif not player or not player.pos then s.clearDot(s); self.used=true; return end\nlocal goal=s.solve(s,floor,count,player.pos)\ns.guidanceLimited=false\ns.dirty=false\ns.nextImpact=s.frames[1].at\nif not goal then s.clearDot(s); self.used=true; return end\nif s.dot then\n local ok=s.drawer:updateTimedCircle(s.dot,nil,goal.x,player.pos.y,goal.z,0.35,0,false,true)\n if not ok then s.dot=nil end\nend\nif not s.dot then\n s.dot=s.drawer:addTimedCircle(math.max(1,math.floor(s.expires-now)),goal.x,player.pos.y,goal.z,0.35,0,false,true)\nend\ns.lastGoal,s.lastAt=goal,s.frames[1].at\nself.used=true",
+				execute = "local s=data.kaptinZeleniaThunder\nif not s or not s.initialized or not s.mode or s.arrowVersion~=1 then self.used=true; return end\nlocal now=Now()\n-- Runs only in this mechanic's timeline window at a 100 ms OnUpdate cadence.\nlocal floor=data.kaptinZeleniaFloor\n-- Thunder Slash requires the observed floor; a fixed mask can point into rose runes.\nif (not floor or not floor.ready) and s.mode==\"rotate\" and s.knownFloor then floor=s.knownFloor(s,floor) end\nif not s.expires or now>s.expires or not floor or not floor.ready then\n s.clearDot(s)\n self.used=true\n return\nend\nif s.lastEvent and now-s.lastEvent<120 then self.used=true; return end\n-- Rebuild only after a mechanic event or changed floor. A stale cast never advances itself.\nif not s.dirty and s.floorVersion==floor.version then\n if s.nextImpact and now>s.nextImpact+250 then s.clearDot(s)\n else s.updateArrow(s,floor,TensorCore.mGetPlayer(),now) end\n self.used=true\n return\nend\nlocal count=s.buildFrames(s,now)\nif count==0 then s.clearDot(s); self.used=true; return end\nlocal player=TensorCore.mGetPlayer()\nif not player or not player.pos then s.clearDot(s); self.used=true; return end\nlocal goal=s.solve(s,floor,count,player.pos)\ns.guidanceLimited=false\ns.dirty=false\ns.nextImpact=s.frames[1].at\nif not goal then s.clearDot(s); self.used=true; return end\nif s.dot then\n local ok=s.drawer:updateTimedCircle(s.dot,nil,goal.x,player.pos.y,goal.z,0.35,0,false,true)\n if not ok then s.dot=nil end\nend\nif not s.dot then\n s.dot=s.drawer:addTimedCircle(math.max(1,math.floor(s.expires-now)),goal.x,player.pos.y,goal.z,0.35,0,false,true)\nend\ns.lastGoal,s.lastAt=goal,s.frames[1].at\ns.pointArrow(s,goal.x,goal.z,math.min(s.expires,s.frames[1].at+250))\ns.updateArrow(s,floor,player,now)\nself.used=true",
 				executeType = 2,
 				loop = true,
 				mechanicTime = 179.1,
-				name = "Thunder II - green dot",
+				name = "Thunder II - safe-position arrow",
+				throttleTime = 100,
 				timeRange = true,
 				timelineIndex = 27,
 				timerEndOffset = 20,
-				timerStartOffset = -10,
+				timerStartOffset = -25,
 				uuid = "c18d0716-a62e-bab0-ae40-60c95797303f",
 				version = 2,
 			},
@@ -2177,6 +2272,17 @@ local tbl =
 	},
 	[34] = 
 	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "4dabd002-6a3f-07ae-c893-6b1477293592",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
+		},
 		
 		{
 			data = 
@@ -2208,19 +2314,33 @@ local tbl =
 				{
 				},
 				displayPath = "Kaptin/Hector Thunder",
-				eventType = 12,
-				execute = "local s=data.kaptinZeleniaThunder\nif not s or not s.initialized or not s.mode then self.used=true; return end\nlocal now=Now()\n-- Bypass the queued updater; retain a 100 ms cap inside the narrow mechanic window.\nif s.dotUpdateAt and now>=s.dotUpdateAt and now-s.dotUpdateAt<100 then self.used=true; return end\ns.dotUpdateAt=now\nlocal floor=data.kaptinZeleniaFloor\n-- Thunder Slash requires the observed floor; a fixed mask can point into rose runes.\nif (not floor or not floor.ready) and s.mode==\"rotate\" and s.knownFloor then floor=s.knownFloor(s,floor) end\nif not s.expires or now>s.expires or not floor or not floor.ready then\n s.clearDot(s)\n self.used=true\n return\nend\nif s.mode==\"slashStage\" then\n if not s.stageAt or now<s.stageAt then self.used=true; return end\n local a=math.rad(-112.5)\n local x,z=100+6.7*math.sin(a),100+6.7*math.cos(a)\n if not s.floorClear(s,floor,x,z,0.6) then s.clearDot(s); self.used=true; return end\n if not s.dot then\n  local player=TensorCore.mGetPlayer()\n  if player and player.pos then\n   s.dot=s.drawer:addTimedCircle(math.max(1,math.floor(s.expires-now)),x,player.pos.y,z,0.35,0,false,true)\n  end\n end\n self.used=true\n return\nend\nif s.lastEvent and now-s.lastEvent<120 then self.used=true; return end\n-- Rebuild only after a mechanic event or changed floor. A stale cast never advances itself.\nif not s.dirty and s.floorVersion==floor.version then\n if s.nextImpact and now>s.nextImpact+250 then s.clearDot(s) end\n self.used=true\n return\nend\nlocal count=s.buildFrames(s,now)\nif count==0 then s.clearDot(s); self.used=true; return end\nlocal player=TensorCore.mGetPlayer()\nif not player or not player.pos then s.clearDot(s); self.used=true; return end\nlocal goal=s.solve(s,floor,count,player.pos)\ns.guidanceLimited=false\ns.dirty=false\ns.nextImpact=s.frames[1].at\nif not goal then s.clearDot(s); self.used=true; return end\nif s.dot then\n local ok=s.drawer:updateTimedCircle(s.dot,nil,goal.x,player.pos.y,goal.z,0.35,0,false,true)\n if not ok then s.dot=nil end\nend\nif not s.dot then\n s.dot=s.drawer:addTimedCircle(math.max(1,math.floor(s.expires-now)),goal.x,player.pos.y,goal.z,0.35,0,false,true)\nend\ns.lastGoal,s.lastAt=goal,s.frames[1].at\nself.used=true",
+				execute = "local s=data.kaptinZeleniaThunder\nif not s or not s.initialized or not s.mode or s.arrowVersion~=1 then self.used=true; return end\nlocal now=Now()\n-- Runs only in this mechanic's timeline window at a 100 ms OnUpdate cadence.\nlocal floor=data.kaptinZeleniaFloor\n-- Thunder Slash requires the observed floor; a fixed mask can point into rose runes.\nif (not floor or not floor.ready) and s.mode==\"rotate\" and s.knownFloor then floor=s.knownFloor(s,floor) end\nif not s.expires or now>s.expires or not floor or not floor.ready then\n s.clearDot(s)\n self.used=true\n return\nend\nif s.mode==\"slashStage\" then\n if not s.stageAt or now<s.stageAt then self.used=true; return end\n local a=math.rad(-112.5)\n local x,z=100+6.7*math.sin(a),100+6.7*math.cos(a)\n if not s.floorClear(s,floor,x,z,0.6) then s.clearDot(s); self.used=true; return end\n if not s.dot then\n  local player=TensorCore.mGetPlayer()\n  if player and player.pos then\n   s.dot=s.drawer:addTimedCircle(math.max(1,math.floor(s.expires-now)),x,player.pos.y,z,0.35,0,false,true)\n  end\n end\n s.pointArrow(s,x,z,s.expires)\n s.updateArrow(s,floor,TensorCore.mGetPlayer(),now)\n self.used=true\n return\nend\nif s.lastEvent and now-s.lastEvent<120 then self.used=true; return end\n-- Rebuild only after a mechanic event or changed floor. A stale cast never advances itself.\nif not s.dirty and s.floorVersion==floor.version then\n if s.nextImpact and now>s.nextImpact+250 then s.clearDot(s)\n else s.updateArrow(s,floor,TensorCore.mGetPlayer(),now) end\n self.used=true\n return\nend\nlocal count=s.buildFrames(s,now)\nif count==0 then s.clearDot(s); self.used=true; return end\nlocal player=TensorCore.mGetPlayer()\nif not player or not player.pos then s.clearDot(s); self.used=true; return end\nlocal goal=s.solve(s,floor,count,player.pos)\ns.guidanceLimited=false\ns.dirty=false\ns.nextImpact=s.frames[1].at\nif not goal then s.clearDot(s); self.used=true; return end\nif s.dot then\n local ok=s.drawer:updateTimedCircle(s.dot,nil,goal.x,player.pos.y,goal.z,0.35,0,false,true)\n if not ok then s.dot=nil end\nend\nif not s.dot then\n s.dot=s.drawer:addTimedCircle(math.max(1,math.floor(s.expires-now)),goal.x,player.pos.y,goal.z,0.35,0,false,true)\nend\ns.lastGoal,s.lastAt=goal,s.frames[1].at\ns.pointArrow(s,goal.x,goal.z,math.min(s.expires,s.frames[1].at+250))\ns.updateArrow(s,floor,player,now)\nself.used=true",
 				executeType = 2,
 				loop = true,
 				mechanicTime = 227.2,
-				name = "Thunder Slash - green dot",
+				name = "Thunder Slash - safe-position arrow",
+				throttleTime = 100,
 				timeRange = true,
 				timelineIndex = 34,
 				timerEndOffset = 10,
-				timerStartOffset = -10,
+				timerStartOffset = -25,
 				uuid = "405a5f84-2812-9798-8150-8da9d5958287",
 				version = 2,
 			},
+		},
+	},
+	[35] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "39b4aa17-c258-dc53-782e-1089b2803067",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
 		},
 	},
 	[44] = 
@@ -2246,7 +2366,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "local s = data.kaptinZeleniaRoses\nlocal f = data.kaptinZeleniaFloor\nlocal role = KaptinZeleniaConfig.role\nlocal pair = s.pair[role]\nif not pair then self.used=true; return end\ns.anchorTile = s.anchorTile or s.anchor(f)\nif s.anchorTile == nil then s.clearGuide(s); self.used=true; return end\nlocal p = TensorCore.mGetPlayer()\nif s.markers[p.id] == 592 then\n    if not s.roseDropped then\n        local offset = pair == 1 and 0 or pair == 2 and 3 or pair == 3 and 4 or 5\n        local tile = (s.anchorTile + offset) % 8\n        if not f.red[tile] then\n            local x,z = s.tilePosition(tile,5.5)\n            s.guide(s,\"rose3:\"..role..\":\"..tile,x,z,7000,false)\n        else s.clearGuide(s) end\n    end\nelse\n    local tile = (s.anchorTile + 2*(pair-1)) % 8\n    local tower = s.towers[tile]\n    if tower and f.red[tile+8] then\n        local duration = tower.endAt - Now()\n        if duration > 0 then s.guide(s,\"tower3:\"..role..\":\"..tile,tower.x,tower.z,duration,false)\n        else s.clearGuide(s) end\n    end\nend\nself.used = true",
+							actionLua = "local s = data.kaptinZeleniaRoses\nlocal f = data.kaptinZeleniaFloor\nlocal role = KaptinZeleniaConfig.role\nlocal pair = s.pair[role]\nif not pair then self.used=true; return end\ns.anchorTile = s.anchorTile or s.anchor(f)\nif s.anchorTile == nil then s.clearGuide(s); self.used=true; return end\nlocal p = TensorCore.mGetPlayer()\nif s.markers[p.id] == 592 then\n    if not s.roseDropped then\n        local offset = pair == 1 and 0 or pair == 2 and 3 or pair == 3 and 4 or 5\n        local tile = (s.anchorTile + offset) % 8\n        if not f.red[tile] then\n            local x,z = s.tilePosition(tile,5.5)\n            s.guide(s,\"rose3:\"..role..\":\"..tile,x,z,7000,true)\n        else s.clearGuide(s) end\n    end\nelse\n    local tile = (s.anchorTile + 2*(pair-1)) % 8\n    local tower = s.towers[tile]\n    if tower and f.red[tile+8] then\n        local duration = tower.endAt - Now()\n        if duration > 0 then s.guide(s,\"tower3:\"..role..\":\"..tile,tower.x,tower.z,duration,true)\n        else s.clearGuide(s) end\n    end\nend\nself.used = true",
 							conditions = 
 							{
 								
@@ -2283,10 +2403,38 @@ local tbl =
 				timeRange = true,
 				timelineIndex = 44,
 				timerEndOffset = 29,
-				timerStartOffset = 12.5,
+				timerStartOffset = -15,
 				uuid = "3e70986a-1768-27b8-9865-bdc742bcc626",
 				version = 2,
 			},
+		},
+	},
+	[48] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "63c3304b-4914-5187-a7a4-c7f16a719fdb",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
+		},
+	},
+	[57] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "824f46a3-75ed-0d17-4506-0aa59b4606f3",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
 		},
 	},
 	[58] = 
@@ -2312,19 +2460,194 @@ local tbl =
 				{
 				},
 				displayPath = "Kaptin Draws",
-				eventType = 12,
-				execute = "local s = data.kaptinZeleniaBaits\nif not s or not s.active or s.wave > #s.orders or not s.showAt then self.used = true; return end\nlocal now = Now()\nif now < s.showAt or now < (s.nextUpdate or 0) then self.used = true; return end\ns.nextUpdate = now + 100\nlocal boss = TensorCore.mGetEntity(s.boss)\nif not boss or now > s.endAt then\n    for id, uuid in pairs(s.draws) do Argus.deleteTimedShape(uuid); s.draws[id] = nil end\n    s.active = false\n    self.used = true\n    return\nend\nlocal alive = 0\nfor i = 1, #s.players do\n    local entry = s.players[i]\n    local entity = TensorCore.mGetEntity(entry.id)\n    if entity and entity.alive then\n        local dx, dz = entity.pos.x - boss.pos.x, entity.pos.z - boss.pos.z\n        entry.distance = dx * dx + dz * dz\n        alive = alive + 1\n    else entry.distance = math.huge end\nend\ntable.sort(s.players, s.sortDistance)\nfor id in pairs(s.selected) do s.selected[id] = nil end\nlocal near = s.orders[s.wave]\nlocal drawer = near and s.nearDrawer or s.farDrawer\nlocal duration = s.endAt - now\nfor i = 1, math.min(4, alive) do\n    local entry = s.players[near and i or alive - i + 1]\n    local entity = TensorCore.mGetEntity(entry.id)\n    if entity then\n        s.selected[entry.id] = true\n        local heading = TensorCore.getHeadingToTarget(boss.pos, entity.pos)\n        local uuid = s.draws[entry.id]\n        local updated = uuid and drawer:updateTimedConeOnEnt(uuid, nil, s.boss, 24, math.pi/4, nil, 0, false, false, heading, true)\n        if not updated then\n            s.draws[entry.id] = drawer:addTimedConeOnEnt(duration, s.boss, 24, math.pi/4, nil, 0, false, false, heading, true)\n        end\n    end\nend\nfor id, uuid in pairs(s.draws) do\n    if not s.selected[id] then Argus.deleteTimedShape(uuid); s.draws[id] = nil end\nend\nself.used = true",
+				execute = "local s = data.kaptinZeleniaBaits\nif not s or not s.active or s.wave > #s.orders or not s.showAt then self.used = true; return end\nlocal now = Now()\nif now < s.showAt or now < (s.nextUpdate or 0) then self.used = true; return end\ns.nextUpdate = now + 100\nlocal boss = TensorCore.mGetEntity(s.boss)\nif not boss or now > s.endAt then\n    for id, uuid in pairs(s.draws) do Argus.deleteTimedShape(uuid); s.draws[id] = nil end\n    s.clearGuide(s)\n    s.active = false\n    self.used = true\n    return\nend\nlocal alive = 0\nfor i = 1, #s.players do\n    local entry = s.players[i]\n    local entity = TensorCore.mGetEntity(entry.id)\n    if entity and entity.alive then\n        local dx, dz = entity.pos.x - boss.pos.x, entity.pos.z - boss.pos.z\n        entry.distance = dx * dx + dz * dz\n        alive = alive + 1\n    else entry.distance = math.huge end\nend\ntable.sort(s.players, s.sortDistance)\nfor id in pairs(s.selected) do s.selected[id] = nil end\nlocal near = s.orders[s.wave]\nlocal drawer = near and s.nearDrawer or s.farDrawer\nlocal duration = s.endAt - now\nfor i = 1, math.min(4, alive) do\n    local entry = s.players[near and i or alive - i + 1]\n    local entity = TensorCore.mGetEntity(entry.id)\n    if entity then\n        s.selected[entry.id] = true\n        local heading = TensorCore.getHeadingToTarget(boss.pos, entity.pos)\n        local uuid = s.draws[entry.id]\n        local updated = uuid and drawer:updateTimedConeOnEnt(uuid, nil, s.boss, 24, math.pi/4, nil, 0, false, false, heading, true)\n        if not updated then\n            s.draws[entry.id] = drawer:addTimedConeOnEnt(duration, s.boss, 24, math.pi/4, nil, 0, false, false, heading, true)\n        end\n    end\nend\nfor id, uuid in pairs(s.draws) do\n    if not s.selected[id] then Argus.deleteTimedShape(uuid); s.draws[id] = nil end\nend\n\nlocal p = TensorCore.mGetPlayer()\nlocal role = KaptinZeleniaConfig and KaptinZeleniaConfig.role\nlocal h = role and s.clocks[role]\nlocal puddles = data.kaptinZeleniaPuddles\nif h and p and not (puddles and puddles.active and puddles.endAt and now < puddles.endAt) then\n    local dps = role == \"M1\" or role == \"M2\" or role == \"R1\" or role == \"R2\"\n    -- DPS starts inside regardless of the first cue. Alternate which group is hit.\n    local dpsBaits = (s.wave % 2 == 1) == s.orders[1]\n    local iBait = dps == dpsBaits\n    local goNear = iBait == s.orders[s.wave]\n    local radius = goNear and 2.5 or math.max(6,boss.hitradius+3)\n    local x,z = boss.pos.x+radius*math.sin(h), boss.pos.z+radius*math.cos(h)\n    s.guide(s,\"bait:\"..s.wave..\":\"..role,x,z,s.endAt-now,true)\nelse\n    s.clearGuide(s)\nend\nself.used = true",
 				executeType = 2,
 				loop = true,
 				mechanicTime = 320.7,
-				name = "Escelons 2 - Live bait cones",
+				name = "Escelons 2 - Baits and my position",
+				throttleTime = 100,
 				timeRange = true,
 				timelineIndex = 58,
 				timerEndOffset = 12,
-				timerStartOffset = -5,
+				timerStartOffset = -25,
 				uuid = "79b673f0-201b-b428-8a5c-a0afbd7e7c66",
 				version = 2,
 			},
+		},
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "Kaptin",
+				uuid = "13fb4573-6ea3-4891-9025-572e70b6a901",
+			},
+			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				displayPath = "Kaptin",
+				name = "Hector Escelons",
+				uuid = "f774ec27-291c-7360-912f-f49a02587cd0",
+			},
+			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				actions = 
+				{
+					
+					{
+						data = 
+						{
+							aType = "Lua",
+							actionLua = "local s = data.kaptinZeleniaPuddles\nif not s then s = { targets = {}, count = 0 }; data.kaptinZeleniaPuddles = s end\nif not s.targets[eventArgs.entityID] then\n    s.targets[eventArgs.entityID] = true\n    s.count = s.count + 1\nend\ns.active = true\ns.endAt = Now() + 10000\nself.used = true",
+							conditions = 
+							{
+								
+								{
+									"95ecfed3-6408-70db-9a2e-a36f5ecaadac",
+									true,
+								},
+							},
+							name = "Escelons 2 - Record puddle targets",
+							uuid = "87c7aefc-19b8-1bf9-aa9b-08a90baff538",
+							version = 2.1,
+						},
+					},
+				},
+				conditions = 
+				{
+					
+					{
+						data = 
+						{
+							category = "Event",
+							dequeueIfLuaFalse = true,
+							eventArgType = 3,
+							markerIDList = 
+							{
+								580,
+							},
+							name = "Puddle marker",
+							uuid = "95ecfed3-6408-70db-9a2e-a36f5ecaadac",
+							version = 3,
+						},
+					},
+				},
+				displayPath = "Kaptin/Hector Escelons",
+				eventType = 4,
+				loop = true,
+				mechanicTime = 320.7,
+				name = "Escelons 2 - Record puddle targets",
+				timeRange = true,
+				timelineIndex = 58,
+				timerEndOffset = -1,
+				timerStartOffset = -35,
+				uuid = "2b90323b-3ee4-cadc-a08d-8d6878611515",
+				version = 2,
+			},
+		},
+		
+		{
+			data = 
+			{
+				actions = 
+				{
+				},
+				conditions = 
+				{
+				},
+				displayPath = "Kaptin/Hector Escelons",
+				execute = "local s = data.kaptinZeleniaPuddles\nif not s or not s.active then self.used=true; return end\nlocal now = Now()\nif not s.endAt or now >= s.endAt then\n    if s.clearGuide then s.clearGuide(s) end\n    s.active=false; self.used=true; return\nend\nlocal r = data.kaptinZeleniaRoses\nlocal b = data.kaptinZeleniaBaits\nif not r or not b or s.count ~= 3 then self.used=true; return end\ns.clearGuide,s.guide = r.clearGuide,r.guide\nlocal p = TensorCore.mGetPlayer()\nlocal boss = TensorCore.mGetEntity(b.boss)\nlocal role = KaptinZeleniaConfig and KaptinZeleniaConfig.role\nlocal h = role and b.clocks[role]\nif not p or not boss or not h then s.clearGuide(s); self.used=true; return end\nlocal x,z = boss.pos.x,boss.pos.z\nif s.targets[p.id] then\n    -- Hector: assigned clock spot, at least max melee. This is a drop point,\n    -- not an assertion about the puddle's undocumented radius.\n    local radius = boss.hitradius+3\n    x,z = x+radius*math.sin(h),z+radius*math.cos(h)\nend\ns.guide(s,\"puddles:\"..role..\":\"..tostring(s.targets[p.id]==true),x,z,s.endAt-now,true)\nself.used=true",
+				executeType = 2,
+				loop = true,
+				mechanicTime = 320.7,
+				name = "Escelons 2 - Hector puddle and center arrows",
+				throttleTime = 100,
+				timeRange = true,
+				timelineIndex = 58,
+				timerEndOffset = -1,
+				timerStartOffset = -35,
+				uuid = "af7780d6-ff52-ffda-9c88-8a17a0a4480f",
+				version = 2,
+			},
+		},
+		
+		{
+			data = 
+			{
+				actions = 
+				{
+					
+					{
+						data = 
+						{
+							aType = "Lua",
+							actionLua = "local s = data.kaptinZeleniaPuddles\nif s then\n    s.active = false\n    if s.clearGuide then s.clearGuide(s) end\nend\nself.used = true",
+							conditions = 
+							{
+								
+								{
+									"0b62e71d-3b84-1da9-9936-ad458f686aeb",
+									true,
+								},
+							},
+							name = "Escelons 2 - Clear dropped puddle arrows",
+							uuid = "d1fe2d69-6257-2da5-bae2-677ec726305d",
+							version = 2.1,
+						},
+					},
+				},
+				conditions = 
+				{
+					
+					{
+						data = 
+						{
+							category = "Event",
+							dequeueIfLuaFalse = true,
+							eventArgOptionType = 3,
+							eventArgType = 2,
+							name = "Puddle resolved",
+							spellIDList = 
+							{
+								43177,
+							},
+							uuid = "0b62e71d-3b84-1da9-9936-ad458f686aeb",
+							version = 3,
+						},
+					},
+				},
+				displayPath = "Kaptin/Hector Escelons",
+				eventType = 2,
+				loop = true,
+				mechanicTime = 320.7,
+				name = "Escelons 2 - Clear dropped puddle arrows",
+				timeRange = true,
+				timelineIndex = 58,
+				timerStartOffset = -35,
+				uuid = "aa1b0ae3-c946-cc42-882f-08c1a78239bd",
+				version = 2,
+			},
+		},
+	},
+	[62] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "1eb3906f-3d25-b2fb-fe42-853de62ec8bf",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
 		},
 	},
 	[64] = 
@@ -2350,7 +2673,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "local s,f = data.kaptinZeleniaRoses,data.kaptinZeleniaFloor\nif s.thornsActive then self.used=true; return end\nlocal p = TensorCore.mGetPlayer()\nlocal role = KaptinZeleniaConfig.role\nlocal marker = s.markers[p.id]\nlocal west = role == \"MT\" or role == \"H1\" or role == \"M1\" or role == \"R1\"\nlocal inner = role == \"MT\" or role == \"OT\" or role == \"M1\" or role == \"M2\"\nlocal sumZ,count,endAt = 0,0,math.huge\nfor _,ground in pairs(s.ground) do\n    sumZ,count = sumZ + ground.z - 100,count + 1\n    endAt = math.min(endAt,ground.endAt)\nend\nif count ~= 2 or math.abs(sumZ) < 4 or endAt <= Now() then\n    s.clearGuide(s); self.used=true; return\nend\nlocal groundSouth = sumZ > 0\ns.groundSouth = groundSouth\nlocal x,z,key\nif marker == 592 and not s.roseDropped then\n    local tile = groundSouth and (west and 7 or 0) or (west and 4 or 3)\n    if not inner then tile = tile + 8 end\n    if not f or not f.ready or not f.red[tile] then\n        x,z = s.tilePosition(tile,inner and 5.5 or 12)\n        key = \"rose4:\"..role..\":\"..tile\n    end\nelseif marker == 596 then\n    -- Spread on the ground-circle side, away from all four rose-drop tiles.\n    local sign = groundSouth and 1 or -1\n    x = 100 + (west and -1 or 1) * (inner and 2.5 or 10.5)\n    z = 100 + sign * (inner and 8.7 or 6.5)\n    local clear = true\n    for _,ground in pairs(s.ground) do\n        local dx,dz = x-ground.x,z-ground.z\n        if dx*dx+dz*dz < 20.25 then clear=false end\n    end\n    if clear then key = \"spread4:\"..role..\":\"..sign else x,z=nil,nil end\nend\nif key then s.guide(s,key,x,z,endAt-Now(),false) else s.clearGuide(s) end\nself.used = true",
+							actionLua = "local s,f = data.kaptinZeleniaRoses,data.kaptinZeleniaFloor\nif s.thornsActive then self.used=true; return end\nlocal p = TensorCore.mGetPlayer()\nlocal role = KaptinZeleniaConfig.role\nlocal marker = s.markers[p.id]\nlocal west = role == \"MT\" or role == \"H1\" or role == \"M1\" or role == \"R1\"\nlocal inner = role == \"MT\" or role == \"OT\" or role == \"M1\" or role == \"M2\"\nlocal sumZ,count,endAt = 0,0,math.huge\nfor _,ground in pairs(s.ground) do\n    sumZ,count = sumZ + ground.z - 100,count + 1\n    endAt = math.min(endAt,ground.endAt)\nend\nif count ~= 2 or math.abs(sumZ) < 4 or endAt <= Now() then\n    s.clearGuide(s); self.used=true; return\nend\nlocal groundSouth = sumZ > 0\ns.groundSouth = groundSouth\nlocal x,z,key\nif marker == 592 and not s.roseDropped then\n    local tile = groundSouth and (west and 7 or 0) or (west and 4 or 3)\n    if not inner then tile = tile + 8 end\n    if f and f.ready and not f.red[tile] then\n        x,z = s.tilePosition(tile,inner and 5.5 or 12)\n        key = \"rose4:\"..role..\":\"..tile\n    end\nelseif marker == 596 then\n    -- Spread on the ground-circle side, away from all four rose-drop tiles.\n    local sign = groundSouth and 1 or -1\n    x = 100 + (west and -1 or 1) * (inner and 2.5 or 10.5)\n    z = 100 + sign * (inner and 8.7 or 6.5)\n    local clear = true\n    for _,ground in pairs(s.ground) do\n        local dx,dz = x-ground.x,z-ground.z\n        if dx*dx+dz*dz < 20.25 then clear=false end\n    end\n    if clear then key = \"spread4:\"..role..\":\"..sign else x,z=nil,nil end\nend\nif key then s.guide(s,key,x,z,endAt-Now(),true) else s.clearGuide(s) end\nself.used = true",
 							conditions = 
 							{
 								
@@ -2387,10 +2710,24 @@ local tbl =
 				timeRange = true,
 				timelineIndex = 64,
 				timerEndOffset = 16,
-				timerStartOffset = 7,
+				timerStartOffset = -20,
 				uuid = "6b867649-a26e-6485-83db-f98382438f3a",
 				version = 2,
 			},
+		},
+	},
+	[66] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "662d10eb-0a03-8fbf-e781-fa211950ebfb",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
 		},
 	},
 	[69] = 
@@ -2416,7 +2753,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "local s = data.kaptinZeleniaRoses\nif s.thornsMove then self.used=true; return end\nif s.groundSouth == nil then s.clearGuide(s); self.used=true; return end\ns.guide(s,\"thorns:stack\",100,100+(s.groundSouth and 4.5 or -4.5),9000,true)\nself.used = true",
+							actionLua = "local s = data.kaptinZeleniaRoses\nif s.groundSouth == nil then s.clearGuide(s); self.used=true; return end\nif not s.thornsMove then\n    s.guide(s,\"thorns:stack\",100,100+(s.groundSouth and 4.5 or -4.5),10000,true)\nelse\n    local role = KaptinZeleniaConfig.role\n    local support = role == \"MT\" or role == \"OT\" or role == \"H1\" or role == \"H2\"\n    local dps = role == \"M1\" or role == \"M2\" or role == \"R1\" or role == \"R2\"\n    local f = data.kaptinZeleniaFloor\n    -- Relative left/right while facing center, on the connected outer rose tiles.\n    local tile = s.groundSouth and (support and 6 or 1) or (support and 2 or 5)\n    if not (support or dps) or not f or not f.ready or not f.red[tile+8]\n        or not s.chainEnd or Now() >= s.chainEnd then\n        s.clearGuide(s); self.used=true; return\n    end\n    local x,z = s.tilePosition(tile,13)\n    s.guide(s,\"thorns:break:\"..role..\":\"..tile,x,z,s.chainEnd-Now(),true)\nend\nself.used = true",
 							conditions = 
 							{
 								
@@ -2425,7 +2762,7 @@ local tbl =
 									true,
 								},
 							},
-							name = "Stack then supports W / DPS E",
+							name = "Stack then relative left/right chain break",
 							uuid = "6c663d65-4785-26d7-a1e1-cbbbad9a1638",
 							version = 2.1,
 						},
@@ -2448,15 +2785,43 @@ local tbl =
 				displayPath = "Kaptin Draws",
 				loop = true,
 				mechanicTime = 369.8,
-				name = "Encircling Thorns - Stack position",
+				name = "Encircling Thorns - Stack and chain arrows",
 				throttleTime = 200,
 				timeRange = true,
 				timelineIndex = 69,
-				timerEndOffset = 10,
-				timerStartOffset = -3.7,
+				timerEndOffset = 14,
+				timerStartOffset = -25,
 				uuid = "0d0367c6-9062-3277-a2ff-f5e257559360",
 				version = 2,
 			},
+		},
+	},
+	[70] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "feb0ca8a-1203-e706-ffa6-dfbce51d661a",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
+		},
+	},
+	[76] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "552e8f98-0aa6-f16c-af1e-26d6ac03ed68",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
 		},
 	},
 	[77] = 
@@ -2482,23 +2847,48 @@ local tbl =
 				{
 				},
 				displayPath = "Kaptin Draws",
-				eventType = 12,
-				execute = "local s = data.kaptinZeleniaBaits\nif not s or not s.active or s.wave > #s.orders or not s.showAt then self.used = true; return end\nlocal now = Now()\nif now < s.showAt or now < (s.nextUpdate or 0) then self.used = true; return end\ns.nextUpdate = now + 100\nlocal boss = TensorCore.mGetEntity(s.boss)\nif not boss or now > s.endAt then\n    for id, uuid in pairs(s.draws) do Argus.deleteTimedShape(uuid); s.draws[id] = nil end\n    s.active = false\n    self.used = true\n    return\nend\nlocal alive = 0\nfor i = 1, #s.players do\n    local entry = s.players[i]\n    local entity = TensorCore.mGetEntity(entry.id)\n    if entity and entity.alive then\n        local dx, dz = entity.pos.x - boss.pos.x, entity.pos.z - boss.pos.z\n        entry.distance = dx * dx + dz * dz\n        alive = alive + 1\n    else entry.distance = math.huge end\nend\ntable.sort(s.players, s.sortDistance)\nfor id in pairs(s.selected) do s.selected[id] = nil end\nlocal near = s.orders[s.wave]\nlocal drawer = near and s.nearDrawer or s.farDrawer\nlocal duration = s.endAt - now\nfor i = 1, math.min(4, alive) do\n    local entry = s.players[near and i or alive - i + 1]\n    local entity = TensorCore.mGetEntity(entry.id)\n    if entity then\n        s.selected[entry.id] = true\n        local heading = TensorCore.getHeadingToTarget(boss.pos, entity.pos)\n        local uuid = s.draws[entry.id]\n        local updated = uuid and drawer:updateTimedConeOnEnt(uuid, nil, s.boss, 24, math.pi/4, nil, 0, false, false, heading, true)\n        if not updated then\n            s.draws[entry.id] = drawer:addTimedConeOnEnt(duration, s.boss, 24, math.pi/4, nil, 0, false, false, heading, true)\n        end\n    end\nend\nfor id, uuid in pairs(s.draws) do\n    if not s.selected[id] then Argus.deleteTimedShape(uuid); s.draws[id] = nil end\nend\nself.used = true",
+				execute = "local s = data.kaptinZeleniaBaits\nif not s or not s.active or s.wave > #s.orders or not s.showAt then self.used = true; return end\nlocal now = Now()\nif now < s.showAt or now < (s.nextUpdate or 0) then self.used = true; return end\ns.nextUpdate = now + 100\nlocal boss = TensorCore.mGetEntity(s.boss)\nif not boss or now > s.endAt then\n    for id, uuid in pairs(s.draws) do Argus.deleteTimedShape(uuid); s.draws[id] = nil end\n    s.clearGuide(s)\n    s.active = false\n    self.used = true\n    return\nend\nlocal alive = 0\nfor i = 1, #s.players do\n    local entry = s.players[i]\n    local entity = TensorCore.mGetEntity(entry.id)\n    if entity and entity.alive then\n        local dx, dz = entity.pos.x - boss.pos.x, entity.pos.z - boss.pos.z\n        entry.distance = dx * dx + dz * dz\n        alive = alive + 1\n    else entry.distance = math.huge end\nend\ntable.sort(s.players, s.sortDistance)\nfor id in pairs(s.selected) do s.selected[id] = nil end\nlocal near = s.orders[s.wave]\nlocal drawer = near and s.nearDrawer or s.farDrawer\nlocal duration = s.endAt - now\nfor i = 1, math.min(4, alive) do\n    local entry = s.players[near and i or alive - i + 1]\n    local entity = TensorCore.mGetEntity(entry.id)\n    if entity then\n        s.selected[entry.id] = true\n        local heading = TensorCore.getHeadingToTarget(boss.pos, entity.pos)\n        local uuid = s.draws[entry.id]\n        local updated = uuid and drawer:updateTimedConeOnEnt(uuid, nil, s.boss, 24, math.pi/4, nil, 0, false, false, heading, true)\n        if not updated then\n            s.draws[entry.id] = drawer:addTimedConeOnEnt(duration, s.boss, 24, math.pi/4, nil, 0, false, false, heading, true)\n        end\n    end\nend\nfor id, uuid in pairs(s.draws) do\n    if not s.selected[id] then Argus.deleteTimedShape(uuid); s.draws[id] = nil end\nend\n\nlocal p = TensorCore.mGetPlayer()\nlocal role = KaptinZeleniaConfig and KaptinZeleniaConfig.role\nlocal h = role and s.clocks[role]\nlocal puddles = data.kaptinZeleniaPuddles\nif h and p and not (puddles and puddles.active and puddles.endAt and now < puddles.endAt) then\n    local dps = role == \"M1\" or role == \"M2\" or role == \"R1\" or role == \"R2\"\n    -- DPS starts inside regardless of the first cue. Alternate which group is hit.\n    local dpsBaits = (s.wave % 2 == 1) == s.orders[1]\n    local iBait = dps == dpsBaits\n    local goNear = iBait == s.orders[s.wave]\n    local radius = goNear and 2.5 or math.max(6,boss.hitradius+3)\n    local x,z = boss.pos.x+radius*math.sin(h), boss.pos.z+radius*math.cos(h)\n    s.guide(s,\"bait:\"..s.wave..\":\"..role,x,z,s.endAt-now,true)\nelse\n    s.clearGuide(s)\nend\nself.used = true",
 				executeType = 2,
 				loop = true,
 				mechanicTime = 418.4,
-				name = "Escelons 3 - Live bait cones",
+				name = "Escelons 3 - Baits and my position",
+				throttleTime = 100,
 				timeRange = true,
 				timelineIndex = 77,
 				timerEndOffset = 12,
-				timerStartOffset = -5,
+				timerStartOffset = -25,
 				uuid = "1bb16f4c-5687-7cea-9b78-fc80af19175f",
 				version = 2,
 			},
 		},
 	},
+	[82] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "2f086e01-2200-7b35-de12-6173785e3991",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
+		},
+	},
 	[88] = 
 	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "3a856f17-3b84-28fb-d3a4-559db350f567",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
+		},
 		
 		{
 			data = 
@@ -2530,19 +2920,61 @@ local tbl =
 				{
 				},
 				displayPath = "Kaptin/Hector Thunder",
-				eventType = 12,
-				execute = "local s=data.kaptinZeleniaThunder\nif not s or not s.initialized or not s.mode then self.used=true; return end\nlocal now=Now()\n-- Bypass the queued updater; retain a 100 ms cap inside the narrow mechanic window.\nif s.dotUpdateAt and now>=s.dotUpdateAt and now-s.dotUpdateAt<100 then self.used=true; return end\ns.dotUpdateAt=now\nlocal floor=data.kaptinZeleniaFloor\n-- Thunder Slash requires the observed floor; a fixed mask can point into rose runes.\nif (not floor or not floor.ready) and s.mode==\"rotate\" and s.knownFloor then floor=s.knownFloor(s,floor) end\nif not s.expires or now>s.expires or not floor or not floor.ready then\n s.clearDot(s)\n self.used=true\n return\nend\nif s.lastEvent and now-s.lastEvent<120 then self.used=true; return end\n-- Rebuild only after a mechanic event or changed floor. A stale cast never advances itself.\nif not s.dirty and s.floorVersion==floor.version then\n if s.nextImpact and now>s.nextImpact+250 then s.clearDot(s) end\n self.used=true\n return\nend\nlocal count=s.buildFrames(s,now)\nif count==0 then s.clearDot(s); self.used=true; return end\nlocal player=TensorCore.mGetPlayer()\nif not player or not player.pos then s.clearDot(s); self.used=true; return end\nlocal goal=s.solve(s,floor,count,player.pos)\ns.guidanceLimited=false\ns.dirty=false\ns.nextImpact=s.frames[1].at\nif not goal then s.clearDot(s); self.used=true; return end\nif s.dot then\n local ok=s.drawer:updateTimedCircle(s.dot,nil,goal.x,player.pos.y,goal.z,0.35,0,false,true)\n if not ok then s.dot=nil end\nend\nif not s.dot then\n s.dot=s.drawer:addTimedCircle(math.max(1,math.floor(s.expires-now)),goal.x,player.pos.y,goal.z,0.35,0,false,true)\nend\ns.lastGoal,s.lastAt=goal,s.frames[1].at\nself.used=true",
+				execute = "local s=data.kaptinZeleniaThunder\nif not s or not s.initialized or not s.mode or s.arrowVersion~=1 then self.used=true; return end\nlocal now=Now()\n-- Runs only in this mechanic's timeline window at a 100 ms OnUpdate cadence.\nlocal floor=data.kaptinZeleniaFloor\n-- Thunder Slash requires the observed floor; a fixed mask can point into rose runes.\nif (not floor or not floor.ready) and s.mode==\"rotate\" and s.knownFloor then floor=s.knownFloor(s,floor) end\nif not s.expires or now>s.expires or not floor or not floor.ready then\n s.clearDot(s)\n self.used=true\n return\nend\nif s.lastEvent and now-s.lastEvent<120 then self.used=true; return end\n-- Rebuild only after a mechanic event or changed floor. A stale cast never advances itself.\nif not s.dirty and s.floorVersion==floor.version then\n if s.nextImpact and now>s.nextImpact+250 then s.clearDot(s)\n else s.updateArrow(s,floor,TensorCore.mGetPlayer(),now) end\n self.used=true\n return\nend\nlocal count=s.buildFrames(s,now)\nif count==0 then s.clearDot(s); self.used=true; return end\nlocal player=TensorCore.mGetPlayer()\nif not player or not player.pos then s.clearDot(s); self.used=true; return end\nlocal goal=s.solve(s,floor,count,player.pos)\ns.guidanceLimited=false\ns.dirty=false\ns.nextImpact=s.frames[1].at\nif not goal then s.clearDot(s); self.used=true; return end\nif s.dot then\n local ok=s.drawer:updateTimedCircle(s.dot,nil,goal.x,player.pos.y,goal.z,0.35,0,false,true)\n if not ok then s.dot=nil end\nend\nif not s.dot then\n s.dot=s.drawer:addTimedCircle(math.max(1,math.floor(s.expires-now)),goal.x,player.pos.y,goal.z,0.35,0,false,true)\nend\ns.lastGoal,s.lastAt=goal,s.frames[1].at\ns.pointArrow(s,goal.x,goal.z,math.min(s.expires,s.frames[1].at+250))\ns.updateArrow(s,floor,player,now)\nself.used=true",
 				executeType = 2,
 				loop = true,
 				mechanicTime = 469.2,
-				name = "Thunder Slash 2 - green dot",
+				name = "Thunder Slash 2 - safe-position arrow",
+				throttleTime = 100,
 				timeRange = true,
 				timelineIndex = 88,
 				timerEndOffset = 10,
-				timerStartOffset = -10,
+				timerStartOffset = -25,
 				uuid = "54260b23-3d4d-cd70-9228-59e1ce1ce057",
 				version = 2,
 			},
+		},
+	},
+	[89] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "4e7c9502-8d10-f3f6-1508-70c877f9fa92",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
+		},
+	},
+	[103] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "e605472d-54eb-3219-def3-9a337b01c2bd",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
+		},
+	},
+	[105] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\zelenia\\main",
+				uuid = "98ee55ff-0741-2da3-a50e-cae9ed1480cf",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\zelenia\\main",
+			objectType = "folder",
 		},
 	},
 	[112] = 
@@ -2578,16 +3010,16 @@ local tbl =
 				{
 				},
 				displayPath = "Kaptin/Hector Thunder",
-				eventType = 12,
-				execute = "local s=data.kaptinZeleniaThunder\nif not s or not s.initialized or not s.mode then self.used=true; return end\nlocal now=Now()\n-- Bypass the queued updater; retain a 100 ms cap inside the narrow mechanic window.\nif s.dotUpdateAt and now>=s.dotUpdateAt and now-s.dotUpdateAt<100 then self.used=true; return end\ns.dotUpdateAt=now\nlocal floor=data.kaptinZeleniaFloor\n-- Thunder Slash requires the observed floor; a fixed mask can point into rose runes.\nif (not floor or not floor.ready) and s.mode==\"rotate\" and s.knownFloor then floor=s.knownFloor(s,floor) end\nif not s.expires or now>s.expires or not floor or not floor.ready then\n s.clearDot(s)\n self.used=true\n return\nend\nif s.lastEvent and now-s.lastEvent<120 then self.used=true; return end\n-- Rebuild only after a mechanic event or changed floor. A stale cast never advances itself.\nif not s.dirty and s.floorVersion==floor.version then\n if s.nextImpact and now>s.nextImpact+250 then s.clearDot(s) end\n self.used=true\n return\nend\nlocal count=s.buildFrames(s,now)\nif count==0 then s.clearDot(s); self.used=true; return end\nlocal player=TensorCore.mGetPlayer()\nif not player or not player.pos then s.clearDot(s); self.used=true; return end\nlocal goal=s.solve(s,floor,count,player.pos)\ns.guidanceLimited=false\ns.dirty=false\ns.nextImpact=s.frames[1].at\nif not goal then s.clearDot(s); self.used=true; return end\nif s.dot then\n local ok=s.drawer:updateTimedCircle(s.dot,nil,goal.x,player.pos.y,goal.z,0.35,0,false,true)\n if not ok then s.dot=nil end\nend\nif not s.dot then\n s.dot=s.drawer:addTimedCircle(math.max(1,math.floor(s.expires-now)),goal.x,player.pos.y,goal.z,0.35,0,false,true)\nend\ns.lastGoal,s.lastAt=goal,s.frames[1].at\nself.used=true",
+				execute = "local s=data.kaptinZeleniaThunder\nif not s or not s.initialized or not s.mode or s.arrowVersion~=1 then self.used=true; return end\nlocal now=Now()\n-- Runs only in this mechanic's timeline window at a 100 ms OnUpdate cadence.\nlocal floor=data.kaptinZeleniaFloor\n-- Thunder Slash requires the observed floor; a fixed mask can point into rose runes.\nif (not floor or not floor.ready) and s.mode==\"rotate\" and s.knownFloor then floor=s.knownFloor(s,floor) end\nif not s.expires or now>s.expires or not floor or not floor.ready then\n s.clearDot(s)\n self.used=true\n return\nend\nif s.lastEvent and now-s.lastEvent<120 then self.used=true; return end\n-- Rebuild only after a mechanic event or changed floor. A stale cast never advances itself.\nif not s.dirty and s.floorVersion==floor.version then\n if s.nextImpact and now>s.nextImpact+250 then s.clearDot(s)\n else s.updateArrow(s,floor,TensorCore.mGetPlayer(),now) end\n self.used=true\n return\nend\nlocal count=s.buildFrames(s,now)\nif count==0 then s.clearDot(s); self.used=true; return end\nlocal player=TensorCore.mGetPlayer()\nif not player or not player.pos then s.clearDot(s); self.used=true; return end\nlocal goal=s.solve(s,floor,count,player.pos)\ns.guidanceLimited=false\ns.dirty=false\ns.nextImpact=s.frames[1].at\nif not goal then s.clearDot(s); self.used=true; return end\nif s.dot then\n local ok=s.drawer:updateTimedCircle(s.dot,nil,goal.x,player.pos.y,goal.z,0.35,0,false,true)\n if not ok then s.dot=nil end\nend\nif not s.dot then\n s.dot=s.drawer:addTimedCircle(math.max(1,math.floor(s.expires-now)),goal.x,player.pos.y,goal.z,0.35,0,false,true)\nend\ns.lastGoal,s.lastAt=goal,s.frames[1].at\ns.pointArrow(s,goal.x,goal.z,math.min(s.expires,s.frames[1].at+250))\ns.updateArrow(s,floor,player,now)\nself.used=true",
 				executeType = 2,
 				loop = true,
 				mechanicTime = 542,
-				name = "Thunder II repeat - green dot",
+				name = "Thunder II repeat - safe-position arrow",
+				throttleTime = 100,
 				timeRange = true,
 				timelineIndex = 112,
 				timerEndOffset = 20,
-				timerStartOffset = -10,
+				timerStartOffset = -25,
 				uuid = "e316d16e-7aea-467f-a836-97cbd084e124",
 				version = 2,
 			},
@@ -2595,6 +3027,7 @@ local tbl =
 	},
 	inheritedProfiles = 
 	{
+		"store\\anyone\\extremes\\zelenia\\main",
 	},
 	timelineName = "zelenia-ex",
 	version = "1.0.1",
