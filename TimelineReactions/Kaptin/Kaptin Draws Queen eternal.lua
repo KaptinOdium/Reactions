@@ -8,7 +8,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "4bc77a58-8fbd-4fd4-d9b8-b442651bcbc8",
+				uuid = "6a9cb0df-c84c-7ceb-339e-e83d8de05b0f",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -22,7 +22,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "fe6aefed-b23c-78b9-ccb3-81eb91db5c5d",
+				uuid = "51314456-d551-af42-eda1-1e28cc314046",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -36,7 +36,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "54f7129f-4f3a-bd3b-4ea6-f3a9e983c5cf",
+				uuid = "c6ba6d98-4424-5d44-f24a-f9e6c05bf208",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -50,7 +50,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "0cf1e8b0-1a61-be4c-dcbb-674a4806e820",
+				uuid = "b531ca87-543f-02b3-d2bf-0e35cc5669f7",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -64,7 +64,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "2888eb49-ed83-2115-3ab2-a73f5a7cbff9",
+				uuid = "f69c31dc-700d-5708-a5ef-529ed9da374c",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -78,7 +78,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "a187a219-fe4b-c0bd-c2e4-5423b44c8549",
+				uuid = "7df94578-ac53-0e9c-4fe0-88ce9659e6a8",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -92,7 +92,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "8121eb34-b84d-f6a8-9bc4-237ade67d664",
+				uuid = "17880f0d-1eff-bf01-09d6-7077dc57b0bd",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -216,7 +216,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "ad8944ef-a873-ef53-6155-95a5c38f0fdf",
+				uuid = "53822c5e-14d9-d272-2849-5cb83fd0148e",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -230,7 +230,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "f7cd3c75-2178-4649-4300-205fe1e48525",
+				uuid = "1d402298-c6dd-642c-1596-4bfe8ad7ad48",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -244,7 +244,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "78096426-d8be-da6a-f5bf-e770aa23a356",
+				uuid = "0bb77f87-48d7-6a1b-64fc-734d8fdf1237",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -258,7 +258,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "783a7dd4-92b8-d250-7865-088ad883f504",
+				uuid = "df79f3a1-d995-ed5d-0a5f-c84b0532dad1",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -272,7 +272,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "d5331741-b57d-7cdd-3d2c-8e27da9802f1",
+				uuid = "0a78db34-b6d1-42d0-4c3e-38ae4dad5864",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -286,7 +286,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "2fb77f76-bdd4-60ba-0d58-a12403ccfe26",
+				uuid = "1e2ce637-74c3-258b-d833-483929eb5767",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -300,7 +300,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "71f02745-9a76-fd19-2d47-cf138390d675",
+				uuid = "19258148-8845-3d9c-b9f3-9adaefab7178",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -314,7 +314,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "dc0ec296-c907-ec02-ffd6-fff8ea9e73c6",
+				uuid = "3cd4b113-9ca2-107f-706b-e019080eca03",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -328,7 +328,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "bf5e9ba8-fbce-474c-0306-b172412bd3d8",
+				uuid = "d82b58f1-7328-b6a5-da54-69bf512c1fa1",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -342,7 +342,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "1cc5b66e-6c08-7992-b50a-432c86dc7f9e",
+				uuid = "c10edb3b-54d3-415f-9c70-92853b9badab",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
@@ -356,7 +356,7 @@ local tbl =
 			{
 				displayPath = "",
 				name = "store\\anyone\\extremes\\sphene-ex",
-				uuid = "1bdfd7f2-39c2-e26e-a685-752868fac8e2",
+				uuid = "4e40fc03-a683-3f6f-7360-c9b5bd54ab73",
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\sphene-ex",
 			objectType = "folder",
