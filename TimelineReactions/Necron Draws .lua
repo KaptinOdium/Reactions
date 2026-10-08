@@ -7,6 +7,17 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "527fbaf5-2bac-aab1-e8fd-bf3f5112b785",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				displayPath = "",
 				name = "Shared draw helpers",
 				uuid = "18e0d25f-c77f-9a4b-ac26-b4b956a8daa4",
 			},
@@ -287,8 +298,33 @@ local tbl =
 			},
 		},
 	},
+	[6] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "5d277c09-a2a2-999d-61fd-1be3cc11b219",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
 	[7] = 
 	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "c5848f3a-e25e-94be-a028-a21469224f0a",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
 		
 		{
 			data = 
@@ -466,6 +502,17 @@ local tbl =
 	},
 	[9] = 
 	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "e56747c0-e479-160c-ad6d-8876be9b50d0",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
 		
 		{
 			data = 
@@ -653,8 +700,8 @@ local tbl =
 				name = "[Cleanup] Memento 1 after Smite",
 				timeRange = true,
 				timelineIndex = 9,
-				timerEndOffset = 12.6,
-				timerStartOffset = -10.4,
+				timerEndOffset = 12.60000038147,
+				timerStartOffset = -10.39999961853,
 				uuid = "5ad3fdc8-e035-77a5-82cc-fb5ddad5f4bf",
 				version = 2,
 			},
@@ -734,6 +781,17 @@ local tbl =
 	},
 	[12] = 
 	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "04e9dc9e-806c-95b2-86ac-9414c7fbd2ae",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
 		
 		{
 			data = 
@@ -914,6 +972,17 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "e516e0fd-f005-40e1-4881-0de362f7414d",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				displayPath = "",
 				name = "Hector draws",
 				uuid = "c51a33f8-e124-e959-a8fe-4ecde72a827b",
 			},
@@ -1050,6 +1119,17 @@ local tbl =
 	},
 	[16] = 
 	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "3958ade2-e63d-16ee-5ae4-4840f0b10d72",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
 		
 		{
 			data = 
@@ -1313,6 +1393,20 @@ local tbl =
 			},
 		},
 	},
+	[19] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "b8253bf7-a2a5-648b-d2a4-7c89e50b3dc7",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
 	[20] = 
 	{
 		
@@ -1496,15 +1590,40 @@ local tbl =
 				name = "[Draw] Embrace 1 marked drop",
 				timeRange = true,
 				timelineIndex = 20,
-				timerEndOffset = 9.1,
-				timerStartOffset = -6.9,
+				timerEndOffset = 9.1000003814697,
+				timerStartOffset = -6.9000000953674,
 				uuid = "85486645-49ea-e382-a7d0-56e54b8a40b2",
 				version = 2,
 			},
 		},
 	},
+	[23] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "0a0c4956-0bb8-046a-bc85-41a8efec7da6",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
 	[24] = 
 	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "b397d38b-231a-0117-bdb6-ed299ec4c85b",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
 		
 		{
 			data = 
@@ -1642,6 +1761,34 @@ local tbl =
 				uuid = "2a7061a3-c1d5-c0aa-b74e-96c4ea6420e9",
 				version = 2,
 			},
+		},
+	},
+	[25] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "4f0659fc-a870-3fb8-e5ca-be5ae7374d4c",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
+	[26] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "57854a69-7efe-fd65-0fc2-6a4b6b043eb9",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
 		},
 	},
 	[27] = 
@@ -2154,6 +2301,34 @@ local tbl =
 			},
 		},
 	},
+	[40] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "95f51099-df49-d445-4ced-d7eb98c40369",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
+	[44] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "1af61605-e4ba-6fd9-cbe8-8a67d5498755",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
 	[56] = 
 	{
 		
@@ -2581,6 +2756,17 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "cde836c3-5d6b-985f-abc3-3085594bfc53",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				displayPath = "",
 				name = "Hector draws",
 				uuid = "05814c21-506b-2b15-ba3f-7aeb69cfb254",
 			},
@@ -2717,6 +2903,17 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "cb004cb4-3a06-d3a0-20e7-6632fed4ff04",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				displayPath = "",
 				name = "Hector draws",
 				uuid = "784e48d1-738a-7208-b4a2-26605a9c35e4",
 			},
@@ -2843,8 +3040,33 @@ local tbl =
 			},
 		},
 	},
+	[62] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "2d8134a1-e36a-138d-5eb5-5143423494b1",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
 	[63] = 
 	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "ae2d9b72-e781-cfee-83ad-e8748fdddd82",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
 		
 		{
 			data = 
@@ -2982,6 +3204,76 @@ local tbl =
 				uuid = "72af263d-fdd0-a77a-b2a9-b23a9af1d25a",
 				version = 2,
 			},
+		},
+	},
+	[64] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "c0ca1ddf-bf7f-39c3-82a0-2b0d76cd3eaf",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
+	[65] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "bfd01260-e477-d0f4-86b7-e76e98d1f930",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
+	[66] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "2073cf4d-f149-f9e1-730d-0a9fb92a839d",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
+	[67] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "857860ae-81b1-4eb2-d93c-eb20f8e67ebe",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
+	[68] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "d2a61f4b-0afc-d407-e70d-abe9da11b31b",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
 		},
 	},
 	[69] = 
@@ -3954,8 +4246,33 @@ local tbl =
 			},
 		},
 	},
+	[84] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "2ba519a9-8a4b-a335-45a9-a70b3541b9f9",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
 	[85] = 
 	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "53b8eada-b329-c636-e118-2d7c5ca4736a",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
 		
 		{
 			data = 
@@ -4096,6 +4413,17 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "bb7ccd3c-96c4-8848-616b-881aa60b778c",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				displayPath = "",
 				name = "Hector draws",
 				uuid = "382477e4-0f0f-17f5-b45f-024067035e47",
 			},
@@ -4222,8 +4550,33 @@ local tbl =
 			},
 		},
 	},
+	[88] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "cb7e46cd-6cd3-cdc1-7596-7c9f6434fb1d",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
 	[89] = 
 	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "3082d82e-33a2-2492-dbc6-5d20a3f0f63e",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
 		
 		{
 			data = 
@@ -4363,6 +4716,76 @@ local tbl =
 			},
 		},
 	},
+	[90] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "b6d93cb8-0f44-282c-e77f-83aae66c3e48",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
+	[91] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "3182fe17-5e57-193b-ba92-a0397c5a28e7",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
+	[92] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "f4ca52e6-249c-b08a-36c5-aecc02d17c36",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
+	[93] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "8d67fa65-878c-1399-ee53-29dbd9f35935",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
+	[94] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "6388058c-e7ab-b7d8-3f7a-df263500215c",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
 	[95] = 
 	{
 		
@@ -4493,6 +4916,20 @@ local tbl =
 				uuid = "acbd1a18-e96d-52cb-86c1-495626dd738d",
 				version = 2,
 			},
+		},
+	},
+	[97] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "f2be47f9-0c8d-1905-31d7-ad574954bd49",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
 		},
 	},
 	[98] = 
@@ -5022,6 +5459,17 @@ local tbl =
 	},
 	[108] = 
 	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "510bd6c0-96f5-07ac-066c-72065b356f50",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
 		
 		{
 			data = 
@@ -5623,8 +6071,23 @@ local tbl =
 			},
 		},
 	},
+	[123] = 
+	{
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "store\\anyone\\extremes\\necron\\main",
+				uuid = "6e9638b3-59e0-dfaf-df2c-4c715ba3fa83",
+			},
+			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
+			objectType = "folder",
+		},
+	},
 	inheritedProfiles = 
 	{
+		"store\\anyone\\extremes\\necron\\main",
 	},
 	timelineName = "necron-ex",
 	version = "1.0.1",
