@@ -2937,6 +2937,119 @@ local tbl =
 			inheritanceRoot = "store\\anyone\\dmu\\main",
 			objectType = "folder",
 		},
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "Viper Optimization",
+				uuid = "f0a57cd2-38e2-597c-9ca1-8bba37e350f9",
+			},
+			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				actions = 
+				{
+					
+					{
+						data = 
+						{
+							aType = "Misc",
+							conditions = 
+							{
+								
+								{
+									"91bab2f8-c276-fab2-896f-5eeca6c09ec5",
+									true,
+								},
+								
+								{
+									"8850ddb1-54b8-e387-8f77-bec9c920384d",
+									true,
+								},
+								
+								{
+									"098ae830-746e-4aab-a98f-57edf4b83783",
+									true,
+								},
+								
+								{
+									"b3b33e87-0db0-c5b4-bb1b-0b01f4aecbf7",
+									true,
+								},
+							},
+							name = "Dexterity Potion",
+							usePot = true,
+							uuid = "81d56187-6d72-5e1e-b441-994261b1e028",
+							version = 2.1,
+						},
+					},
+				},
+				conditions = 
+				{
+					
+					{
+						data = 
+						{
+							category = "Self",
+							conditionType = 13,
+							jobValue = "VIPER",
+							name = "Viper",
+							uuid = "91bab2f8-c276-fab2-896f-5eeca6c09ec5",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Self",
+							conditionType = 7,
+							name = "In Combat",
+							uuid = "8850ddb1-54b8-e387-8f77-bec9c920384d",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Self",
+							conditionType = 2,
+							hpType = 2,
+							hpValue = 1,
+							name = "Alive",
+							uuid = "098ae830-746e-4aab-a98f-57edf4b83783",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							buffCheckType = 2,
+							buffID = 49,
+							category = "Self",
+							name = "Not Medicated",
+							uuid = "b3b33e87-0db0-c5b4-bb1b-0b01f4aecbf7",
+							version = 3,
+						},
+					},
+				},
+				displayPath = "Viper Optimization",
+				mechanicTime = 855.99403801671,
+				name = "[VPR] P4 Kill Potion",
+				timeRange = true,
+				timelineIndex = 159,
+				timerEndOffset = 12.00596198329,
+				timerStartOffset = 6.00596198329,
+				uuid = "e677046a-06a1-7df3-9e85-7988a6740a77",
+				version = 2,
+			},
+		},
 	},
 	[161] = 
 	{
@@ -3489,6 +3602,118 @@ local tbl =
 			},
 			inheritanceRoot = "Lj\\umad\\draws_lpdu",
 			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "Viper Optimization",
+				uuid = "fb2103fe-5492-8481-a406-f493f4122dbc",
+			},
+			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				actions = 
+				{
+					
+					{
+						data = 
+						{
+							aType = "Misc",
+							conditions = 
+							{
+								
+								{
+									"fcc3d0b6-5504-21ed-bcd5-4e36d951a73c",
+									true,
+								},
+								
+								{
+									"93d45ec0-66b3-cc07-988a-880b966c19d6",
+									true,
+								},
+								
+								{
+									"f526138a-4399-6842-9c34-72cb3becd97b",
+									true,
+								},
+								
+								{
+									"8dd1251c-e6df-6de4-8393-6dcfee134a2c",
+									true,
+								},
+							},
+							name = "Dexterity Potion",
+							usePot = true,
+							uuid = "7d7d30cb-3a5b-ba0f-874e-4623dc3359c0",
+							version = 2.1,
+						},
+					},
+				},
+				conditions = 
+				{
+					
+					{
+						data = 
+						{
+							category = "Self",
+							conditionType = 13,
+							jobValue = "VIPER",
+							name = "Viper",
+							uuid = "fcc3d0b6-5504-21ed-bcd5-4e36d951a73c",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Self",
+							conditionType = 7,
+							name = "In Combat",
+							uuid = "93d45ec0-66b3-cc07-988a-880b966c19d6",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Self",
+							conditionType = 2,
+							hpType = 2,
+							hpValue = 1,
+							name = "Alive",
+							uuid = "f526138a-4399-6842-9c34-72cb3becd97b",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							buffCheckType = 2,
+							buffID = 49,
+							category = "Self",
+							name = "Not Medicated",
+							uuid = "8dd1251c-e6df-6de4-8393-6dcfee134a2c",
+							version = 3,
+						},
+					},
+				},
+				displayPath = "Viper Optimization",
+				mechanicTime = 1149.6575474604,
+				name = "[VPR] P5 Final Burst Potion",
+				timeRange = true,
+				timelineIndex = 225,
+				timerEndOffset = 6,
+				uuid = "54590fdc-a0f3-b768-abc3-0f1d72701ec9",
+				version = 2,
+			},
 		},
 	},
 	[227] = 
