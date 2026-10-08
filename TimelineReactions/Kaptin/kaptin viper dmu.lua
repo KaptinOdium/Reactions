@@ -38,6 +38,55 @@ local tbl =
 				{
 					
 					{
+						position = 1,
+						type = "add",
+						value = 
+						{
+							data = 
+							{
+								aType = "ACR",
+								conditions = 
+								{
+									
+									{
+										"40adde6d-7862-f933-b892-ae1cd2280e1f",
+										true,
+									},
+								},
+								gVar = "ACR_TensorViper3_Burn",
+								gVarValue = 2,
+								uuid = "bd49b2e7-b091-5a11-9b21-92ce03a30f90",
+								version = 2.1,
+							},
+							inheritedIndex = 1,
+						},
+					},
+					
+					{
+						position = 2,
+						type = "add",
+						value = 
+						{
+							data = 
+							{
+								aType = "ACR",
+								conditions = 
+								{
+									
+									{
+										"40adde6d-7862-f933-b892-ae1cd2280e1f",
+										true,
+									},
+								},
+								gVar = "ACR_TensorViper3_WrithingSnap",
+								uuid = "a37c8cf1-9d2c-3903-93a8-2dc044eff658",
+								version = 2.1,
+							},
+							inheritedIndex = 2,
+						},
+					},
+					
+					{
 						type = "add",
 						value = 
 						{
@@ -2658,6 +2707,65 @@ local tbl =
 			{
 				actions = 
 				{
+					
+					{
+						data = 
+						{
+							aType = "ACR",
+							conditions = 
+							{
+								
+								{
+									"78fe97ed-17f3-ced4-869f-d24829f04843",
+									true,
+								},
+								
+								{
+									"201aecf2-4120-9e1b-adad-71de8d12c181",
+									true,
+								},
+								
+								{
+									"1d8318b3-85cb-a6a6-9ef4-b369cb47af9d",
+									true,
+								},
+							},
+							gVar = "ACR_TensorViper3_Burn",
+							gVarValue = 2,
+							uuid = "7566c749-2dd8-4954-95ab-b36be049081f",
+							version = 2.1,
+						},
+						inheritedIndex = 1,
+					},
+					
+					{
+						data = 
+						{
+							aType = "ACR",
+							conditions = 
+							{
+								
+								{
+									"78fe97ed-17f3-ced4-869f-d24829f04843",
+									true,
+								},
+								
+								{
+									"201aecf2-4120-9e1b-adad-71de8d12c181",
+									true,
+								},
+								
+								{
+									"1d8318b3-85cb-a6a6-9ef4-b369cb47af9d",
+									true,
+								},
+							},
+							gVar = "ACR_TensorViper3_WrithingSnap",
+							uuid = "6079a671-4d9b-6ec8-8ba4-e365f6e320c1",
+							version = 2.1,
+						},
+						inheritedIndex = 2,
+					},
 					
 					{
 						data = 
