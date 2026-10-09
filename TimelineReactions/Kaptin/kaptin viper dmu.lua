@@ -182,6 +182,7 @@ local tbl =
 					},
 				},
 				displayPath = "Viper Optimization",
+				enabled = false,
 				name = "[VPR] DMU Burst Setup",
 				timeRange = true,
 				timerEndOffset = -7.2617654800415,
@@ -645,6 +646,7 @@ local tbl =
 					},
 				},
 				displayPath = "Viper Optimization",
+				enabled = false,
 				mechanicTime = 118.07975730716,
 				name = "[VPR] P1 Burst Potion",
 				timeRange = true,
@@ -944,6 +946,48 @@ local tbl =
 			inheritanceRoot = "store\\anyone\\dmu\\main",
 			objectType = "folder",
 		},
+		
+		{
+			data = 
+			{
+				name = "[VPR] Hold Vicewinder 1",
+				uuid = "d7e830bd-5bec-0a94-8170-a502f83ebdbe",
+				version = 2,
+			},
+			inheritedObjectUUID = "06a02f4a-2fbc-cd04-b77b-af7d9e904cf1",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
+		},
+		
+		{
+			data = 
+			{
+				name = "[VPR] Hold Vicewinder 2",
+				uuid = "dc9ef6ef-1be5-f74b-9580-758ffb9ca9e4",
+				version = 2,
+			},
+			inheritedObjectUUID = "fcb3535c-271b-1782-ab20-abc6af30e223",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
+		},
+		
+		{
+			data = 
+			{
+				name = "[VPR] Hold Reawaken",
+				uuid = "be4be6ef-ca51-d4d5-bd2a-86d90971cc1b",
+				version = 2,
+			},
+			inheritedObjectUUID = "6929710b-5db9-3d83-9949-5ec28e5b9795",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
+		},
 	},
 	[40] = 
 	{
@@ -1088,6 +1132,7 @@ local tbl =
 					},
 				},
 				displayPath = "Viper Optimization",
+				enabled = false,
 				loop = true,
 				mechanicTime = 235.34477128997,
 				name = "[VPR] P2 Four-Minute Reserve",
@@ -1542,6 +1587,7 @@ local tbl =
 					},
 				},
 				displayPath = "Viper Optimization",
+				enabled = false,
 				mechanicTime = 352.92100258191,
 				name = "[VPR] P2 Trines - No Pooling",
 				timeRange = true,
@@ -1724,6 +1770,7 @@ local tbl =
 					},
 				},
 				displayPath = "Viper Optimization",
+				enabled = false,
 				mechanicTime = 427.45958272918,
 				name = "[VPR] P3 Restore Burst Settings",
 				timeRange = true,
@@ -1907,6 +1954,7 @@ local tbl =
 					},
 				},
 				displayPath = "Viper Optimization",
+				enabled = false,
 				mechanicTime = 481.45392399289,
 				name = "[VPR] P3 Burst Potion",
 				timeRange = true,
@@ -2476,6 +2524,7 @@ local tbl =
 					},
 				},
 				displayPath = "Viper Optimization",
+				enabled = false,
 				loop = true,
 				mechanicTime = 699.71269025282,
 				name = "[VPR] P3 Hold Ire for P4",
@@ -2582,6 +2631,7 @@ local tbl =
 					},
 				},
 				displayPath = "Viper Optimization",
+				enabled = false,
 				loop = true,
 				mechanicTime = 699.71269025282,
 				name = "[VPR] P3 Reserve 50 Gauge",
@@ -2864,6 +2914,7 @@ local tbl =
 					},
 				},
 				displayPath = "Viper Optimization",
+				enabled = false,
 				eventType = 26,
 				mechanicTime = 801.88345429349,
 				name = "[VPR] P4 Burst Release",
@@ -3148,6 +3199,7 @@ local tbl =
 					},
 				},
 				displayPath = "Viper Optimization",
+				enabled = false,
 				mechanicTime = 855.99403801671,
 				name = "[VPR] P4 Kill Potion",
 				timeRange = true,
@@ -3814,6 +3866,7 @@ local tbl =
 					},
 				},
 				displayPath = "Viper Optimization",
+				enabled = false,
 				mechanicTime = 1149.6575474604,
 				name = "[VPR] P5 Final Burst Potion",
 				timeRange = true,
