@@ -24,6 +24,74 @@ local tbl =
 			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
 			objectType = "folder",
 		},
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "AutoSim - Necron adds trial",
+				uuid = "8db6d746-bdb9-9cad-9f1a-c4f09866f5e3",
+			},
+			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				actions = 
+				{
+					
+					{
+						data = 
+						{
+							aType = "Lua",
+							actionLua = "-- Necron AutoSim trial, SAM v1 / VPR v2.5.\n-- Baseline: deathless SAM clear 20261009-2319-1296-2, 433.969 seconds.\n-- ADD_VALUE is an experimental scoring preference, not actual resistance.\n-- The 5% raid-buff forecast represents the observed DNC windows, not a\n-- complete reconstruction of every party buff. Recheck with the next clear.\n-- No target-slot, AoE, movement, positional, CD, or action-hold overrides.\nlocal api = TensorCore.API.TensorACR\nlocal s = {\n    firstStart = 200.968, firstEnd = 230.859,\n    depart = 247.203, arrive = 261.281,\n    handsEnd = 282.171, back = 296.875,\n    stage = 0, hands = {}, addValue = 0.2,\n}\nfunction s.apply()\n    api.setAutoSimKillTime(s.back + 137.094)\n    -- This profile owns these three forecast types. Rebuild at significant\n    -- transitions rather than keeping IDs across reset/schedule replacement.\n    api.clearAutoSimPhases(\"FullDowntime\")\n    api.clearAutoSimPhases(\"BossModifier\")\n    api.clearAutoSimPhases(\"RaidBuff\")\n    local function phase(kind, a, b, value)\n        if b > a then api.addAutoSimPhase(kind, a, b, value) end\n    end\n    phase(\"BossModifier\", s.firstStart, s.firstEnd, s.addValue)\n    phase(\"BossModifier\", s.arrive, s.handsEnd, s.addValue)\n    phase(\"FullDowntime\", s.depart, s.arrive)\n    phase(\"FullDowntime\", s.handsEnd, s.back)\n    phase(\"RaidBuff\", 7.657, 27.657, 1.05)\n    phase(\"RaidBuff\", 127.828, 147.828, 1.05)\n    phase(\"RaidBuff\", s.back + 6.578, s.back + 26.578, 1.05)\n    phase(\"RaidBuff\", s.back + 126.438, s.back + 146.438, 1.05)\nend\ns.apply()\ndata.kaptinNecronAutoSim = s\nself.used = true\n",
+							conditions = 
+							{
+								
+								{
+									"c0b52f4a-80f3-5386-9d49-770768a96d55",
+									true,
+								},
+							},
+							name = "[AutoSim] Necron add forecast",
+							uuid = "7539fa41-17cd-bd20-b364-074da7d9ac45",
+							version = 2.1,
+						},
+					},
+				},
+				conditions = 
+				{
+					
+					{
+						data = 
+						{
+							category = "Self",
+							conditionType = 14,
+							dequeueIfLuaFalse = true,
+							jobIDList = 
+							{
+								34,
+							},
+							name = "Samurai",
+							uuid = "c0b52f4a-80f3-5386-9d49-770768a96d55",
+							version = 3,
+						},
+					},
+				},
+				displayPath = "AutoSim - Necron adds trial",
+				eventType = 16,
+				loop = true,
+				mechanicTime = 14.8,
+				name = "[AutoSim] Necron add forecast",
+				timeRange = true,
+				timelineIndex = 2,
+				timerEndOffset = -14.8,
+				timerStartOffset = -74.8,
+				uuid = "e62c66a7-aac0-d653-a433-92dce3648481",
+				version = 2,
+			},
+		},
 	},
 	[4] = 
 	{
@@ -405,7 +473,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "-- Native gates: SAM, Necron content 14093, targetable=false, timeline >=195.\nlocal boss=TensorCore.mGetEntity(eventArgs.entityID)\nif not boss or Argus.getEntityModel(boss)~=18699 then self.used=true return end\nlocal s=data.kaptinNecronSamCD\nif s and s.bossID~=boss.id then self.used=true return end\nif not s then\n    s={bossID=boss.id}\n    data.kaptinNecronSamCD=s\nend\nif not s.active then\n    if type(ACR_TensorWeeb4_CD)~=\"boolean\" then self.used=true return end\n    -- Snapshot and switch together so wipe recovery cannot see partial state.\n    s.previousCD=ACR_TensorWeeb4_CD\n    s.active=true\n    ACR_TensorWeeb4_CD=false\nend\n-- Capture once across both add sections, including an existing CD-only state.\nif s.previousDoTs==nil and type(ACR_TensorWeeb4_DoTs)==\"boolean\" then\n    s.previousDoTs=ACR_TensorWeeb4_DoTs\n    ACR_TensorWeeb4_DoTs=false\nend\nif s.darknessSeen then s.abyssStarted=true end\nself.used=true\n",
+							actionLua = "-- Native gates: SAM, Necron content 14093, targetable=false, timeline >=195.\nlocal boss=TensorCore.mGetEntity(eventArgs.entityID)\nif not boss or Argus.getEntityModel(boss)~=18699 then self.used=true return end\nlocal s=data.kaptinNecronSamCD\nif s and s.bossID~=boss.id then self.used=true return end\nif not s then\n    s={bossID=boss.id}\n    data.kaptinNecronSamCD=s\nend\n-- SAM v1 DoT safeguard only; AutoSim chooses cooldowns.\nif not s.active then\n    if type(ACR_TensorWeeb4_DoTs)~=\"boolean\" then self.used=true return end\n    s.previousDoTs=ACR_TensorWeeb4_DoTs\n    s.active=true\n    ACR_TensorWeeb4_DoTs=false\nend\nif s.darknessSeen then s.abyssStarted=true end\nself.used=true\n",
 							conditions = 
 							{
 								
@@ -424,7 +492,7 @@ local tbl =
 									true,
 								},
 							},
-							name = "[SAM] Hold CD and DoTs through both add phases",
+							name = "[SAM] Hold DoTs through both add phases",
 							uuid = "81847a49-3792-1f90-9b70-83c4ff64fe4a",
 							version = 2.1,
 						},
@@ -478,7 +546,7 @@ local tbl =
 				eventType = 26,
 				loop = true,
 				mechanicTime = 199.5,
-				name = "[SAM] Hold CD and DoTs through both add phases",
+				name = "[SAM] Hold DoTs through both add phases",
 				timeRange = true,
 				timelineIndex = 44,
 				timerEndOffset = 75.5,
@@ -498,7 +566,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "-- Runs only after the second departure; first add-wave return must not release.\nlocal s=data.kaptinNecronSamCD\nif not s or not s.active or not s.abyssStarted then return end\nlocal player=TensorCore.mGetPlayer()\nlocal boss=TensorCore.mGetEntity(s.bossID)\nif not player or not player.alive or not boss or not boss.alive\n    or not boss.targetable or not boss.attackable then return end\nif boss.contentid~=14093 or Argus.getEntityModel(boss)~=18699 then return end\nlocal p=player.pos\nif p.x<82 or p.x>118 or p.z<85 or p.z>115 or math.abs(p.y)>=5\n    or math.abs(p.y-boss.pos.y)>=5 then return end\nACR_TensorWeeb4_CD=s.previousCD\nif type(s.previousDoTs)==\"boolean\" then ACR_TensorWeeb4_DoTs=s.previousDoTs end\ns.active=false\nself.used=true\n",
+							actionLua = "-- Runs only after the second departure; first add-wave return must not release.\nlocal s=data.kaptinNecronSamCD\nif not s or not s.active or not s.abyssStarted then return end\nlocal player=TensorCore.mGetPlayer()\nlocal boss=TensorCore.mGetEntity(s.bossID)\nif not player or not player.alive or not boss or not boss.alive\n    or not boss.targetable or not boss.attackable then return end\nif boss.contentid~=14093 or Argus.getEntityModel(boss)~=18699 then return end\nlocal p=player.pos\nif p.x<82 or p.x>118 or p.z<85 or p.z>115 or math.abs(p.y)>=5\n    or math.abs(p.y-boss.pos.y)>=5 then return end\nif type(s.previousDoTs)==\"boolean\" then ACR_TensorWeeb4_DoTs=s.previousDoTs end\ns.active=false\nself.used=true\n",
 							conditions = 
 							{
 								
@@ -512,7 +580,7 @@ local tbl =
 									true,
 								},
 							},
-							name = "[SAM] Restore CD and DoTs on Necron return",
+							name = "[SAM] Restore DoTs on Necron return",
 							uuid = "bb45c3cb-e64e-bb8e-a494-adcbbbe9dc32",
 							version = 2.1,
 						},
@@ -549,7 +617,7 @@ local tbl =
 				},
 				displayPath = "SAM burst",
 				mechanicTime = 199.5,
-				name = "[SAM] Restore CD and DoTs on Necron return",
+				name = "[SAM] Restore DoTs on Necron return",
 				throttleTime = 250,
 				timeRange = true,
 				timelineIndex = 44,
@@ -570,8 +638,8 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "-- TensorReactions clears data before OnWipe; restore from its documented snapshot.\nlocal previous=eventArgs.oldData\nlocal s=previous and previous.kaptinNecronSamCD\nif s and s.active then\n    ACR_TensorWeeb4_CD=s.previousCD\n    if type(s.previousDoTs)==\"boolean\" then ACR_TensorWeeb4_DoTs=s.previousDoTs end\n    s.active=false\nend\nself.used=true\n",
-							name = "[SAM] Restore CD and DoTs on wipe",
+							actionLua = "-- TensorReactions clears data before OnWipe; restore from its documented snapshot.\nlocal previous=eventArgs.oldData\nlocal s=previous and previous.kaptinNecronSamCD\nif s and s.active then\n    if type(s.previousDoTs)==\"boolean\" then ACR_TensorWeeb4_DoTs=s.previousDoTs end\n    s.active=false\nend\nself.used=true\n",
+							name = "[SAM] Restore DoTs on wipe",
 							uuid = "6828453a-fc45-78a0-864a-478364458733",
 							version = 2.1,
 						},
@@ -584,12 +652,205 @@ local tbl =
 				eventType = 9,
 				loop = true,
 				mechanicTime = 199.5,
-				name = "[SAM] Restore CD and DoTs on wipe",
+				name = "[SAM] Restore DoTs on wipe",
 				timeRange = true,
 				timelineIndex = 44,
 				timerEndOffset = 700.5,
 				timerStartOffset = -229.5,
 				uuid = "773ca843-39d1-2498-8068-a71f270cfac8",
+				version = 2,
+			},
+		},
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "AutoSim - Necron adds trial",
+				uuid = "04a64068-1e22-4273-9b72-5d302b8380a0",
+			},
+			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				actions = 
+				{
+					
+					{
+						data = 
+						{
+							aType = "Lua",
+							actionLua = "-- Native gate: main Necron content ID; linked Lua gate verifies model18699.\nlocal s = data.kaptinNecronAutoSim\nlocal t = TensorCore.API.TensorACR.getAutoSimTime()\nif s.stage == 0 and not eventArgs.isTargetable and t >= 190 and t < 225 then\n    s.bossID = eventArgs.entityID\n    s.firstStart = t\n    s.stage = 1\n    s.apply()\nelseif s.bossID == eventArgs.entityID then\n    if s.stage == 1 and eventArgs.isTargetable then\n        s.firstEnd = t\n        s.depart, s.arrive = t + 16.344, t + 30.422\n        s.handsEnd, s.back = t + 51.312, t + 66.016\n        s.stage = 2\n        s.apply()\n    elseif s.stage == 2 and not eventArgs.isTargetable then\n        s.depart, s.arrive = t, t + 14.078\n        s.handsEnd, s.back = t + 34.968, t + 49.672\n        s.stage = 3\n        s.apply()\n    end\nend\nself.used = true\n",
+							conditions = 
+							{
+								
+								{
+									"91709a38-e04f-7f1e-838c-40fea8efc2f7",
+									true,
+								},
+								
+								{
+									"36e535c3-4fe5-8df6-ae17-70494927e4c2",
+									true,
+								},
+								
+								{
+									"6868395e-bb95-eb78-aff1-39123ff30d52",
+									true,
+								},
+								
+								{
+									"01c277ed-dc9c-2975-97ba-7e6cd41ba4fb",
+									true,
+								},
+							},
+							name = "[AutoSim] Follow Necron departures and bridge",
+							uuid = "492cfd93-366b-63da-bace-87f93fcecf88",
+							version = 2.1,
+						},
+					},
+				},
+				conditions = 
+				{
+					
+					{
+						data = 
+						{
+							category = "Self",
+							conditionType = 14,
+							dequeueIfLuaFalse = true,
+							jobIDList = 
+							{
+								34,
+							},
+							name = "Samurai",
+							uuid = "91709a38-e04f-7f1e-838c-40fea8efc2f7",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Event",
+							dequeueIfLuaFalse = true,
+							eventArgOptionType = 2,
+							eventEntityContentID = 14093,
+							name = "Necron",
+							uuid = "36e535c3-4fe5-8df6-ae17-70494927e4c2",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Lua",
+							conditionLua = "return Argus.getEntityModel(eventArgs.entityID) == 18699",
+							dequeueIfLuaFalse = true,
+							name = "Main boss model",
+							uuid = "6868395e-bb95-eb78-aff1-39123ff30d52",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Lua",
+							conditionLua = "local s=data.kaptinNecronAutoSim\nreturn s~=nil and s.stage<6",
+							name = "Forecast initialized",
+							uuid = "01c277ed-dc9c-2975-97ba-7e6cd41ba4fb",
+							version = 3,
+						},
+					},
+				},
+				displayPath = "AutoSim - Necron adds trial",
+				eventType = 26,
+				loop = true,
+				mechanicTime = 199.5,
+				name = "[AutoSim] Follow Necron departures and bridge",
+				timeRange = true,
+				timelineIndex = 44,
+				timerEndOffset = 200.5,
+				timerStartOffset = -14.5,
+				uuid = "d1937ca9-f40b-a5b8-aee1-5a797a850053",
+				version = 2,
+			},
+		},
+		
+		{
+			data = 
+			{
+				actions = 
+				{
+					
+					{
+						data = 
+						{
+							aType = "Lua",
+							actionLua = "-- Bounded 250ms poll during mandatory adds only. Tracks already known IDs;\n-- no entity-list scans, model internals, or frame callbacks.\nlocal s = data.kaptinNecronAutoSim\nlocal t = TensorCore.API.TensorACR.getAutoSimTime()\nlocal boss = s.bossID and TensorCore.mGetEntity(s.bossID)\nlocal player = TensorCore.mGetPlayer()\n-- Boss visibility alone is insufficient: the player must be back upstairs.\nif s.stage >= 3 and boss and boss.alive and boss.targetable and boss.attackable\n    and player and player.alive then\n    local p = player.pos\n    if p.x >= 82 and p.x <= 118 and p.z >= 85 and p.z <= 115\n        and math.abs(p.y) < 5 and math.abs(p.y - boss.pos.y) < 5 then\n        -- If a hand's death event was missed, do not leave a future add\n        -- valuation interval or a no-target gap after the player's return.\n        s.arrive = math.min(s.arrive, t)\n        s.handsEnd = math.min(s.handsEnd, t)\n        s.back = t\n        s.stage = 6\n        s.apply()\n        self.used = true\n        return\n    end\nend\nlocal changed = false\nif s.stage == 1 and t >= s.firstEnd - 0.5 then\n    s.firstEnd = t + 1\n    s.depart, s.arrive = s.firstEnd + 16.344, s.firstEnd + 30.422\n    s.handsEnd, s.back = s.firstEnd + 51.312, s.firstEnd + 66.016\n    changed = true\nelseif s.stage == 2 and t >= s.depart - 0.5 then\n    s.depart, s.arrive = t + 1, t + 15.078\n    s.handsEnd, s.back = t + 35.968, t + 50.672\n    changed = true\nelseif s.stage == 3 and t >= s.arrive - 0.5 then\n    s.arrive = t + 1\n    s.handsEnd, s.back = s.arrive + 20.890, s.arrive + 35.594\n    changed = true\nelseif s.stage == 4 then\n    local count, active = 0, 0\n    for id, wasActive in pairs(s.hands) do\n        count = count + 1\n        local hand = TensorCore.mGetEntity(id)\n        if wasActive and (not hand or (hand.alive and hand.targetable)) then\n            active = active + 1\n        elseif hand and (not hand.alive or not hand.targetable) then\n            s.hands[id] = false\n        end\n    end\n    if count >= 2 and active == 0 then\n        s.handsEnd, s.back = t, t + 14.704\n        s.stage = 5\n        changed = true\n    elseif t >= s.handsEnd - 0.5 then\n        s.handsEnd, s.back = t + 1, t + 15.704\n        changed = true\n    end\nelseif s.stage == 5 and t >= s.back - 0.5 then\n    s.back = t + 1\n    changed = true\nend\nif changed then s.apply() end\nself.used = true\n",
+							conditions = 
+							{
+								
+								{
+									"46933984-46b7-00e0-bfa9-4ee0eb7e621e",
+									true,
+								},
+								
+								{
+									"b34c0d63-22ef-90e8-b30e-84ebb9196869",
+									true,
+								},
+							},
+							name = "[AutoSim] Correct slow adds and personal return",
+							uuid = "d66eb80b-92bb-0c99-a6f8-8a5c80681a8e",
+							version = 2.1,
+						},
+					},
+				},
+				conditions = 
+				{
+					
+					{
+						data = 
+						{
+							category = "Self",
+							conditionType = 14,
+							dequeueIfLuaFalse = true,
+							jobIDList = 
+							{
+								34,
+							},
+							name = "Samurai",
+							uuid = "46933984-46b7-00e0-bfa9-4ee0eb7e621e",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Lua",
+							conditionLua = "local s=data.kaptinNecronAutoSim\nreturn s~=nil and s.stage>0 and s.stage<6",
+							name = "Add sequence active",
+							uuid = "b34c0d63-22ef-90e8-b30e-84ebb9196869",
+							version = 3,
+						},
+					},
+				},
+				displayPath = "AutoSim - Necron adds trial",
+				loop = true,
+				mechanicTime = 199.5,
+				name = "[AutoSim] Correct slow adds and personal return",
+				throttleTime = 250,
+				timeRange = true,
+				timelineIndex = 44,
+				timerEndOffset = 200.5,
+				timerStartOffset = -9.5,
+				uuid = "5d4dcb21-4f34-af89-99ec-64c1c3fbb266",
 				version = 2,
 			},
 		},
@@ -677,6 +938,125 @@ local tbl =
 				timerEndOffset = 19.2,
 				timerStartOffset = -25.8,
 				uuid = "49175e27-6970-a012-9eaf-a4fdb15c8822",
+				version = 2,
+			},
+		},
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "AutoSim - Necron adds trial",
+				uuid = "e5526207-447e-c73b-9bc4-37502534de80",
+			},
+			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				actions = 
+				{
+					
+					{
+						data = 
+						{
+							aType = "Lua",
+							actionLua = "-- Native content14094 gate plus model18701 gate: the two local Abyss hands.\nlocal s = data.kaptinNecronAutoSim\nlocal t = TensorCore.API.TensorACR.getAutoSimTime()\nif s.stage == 3 and eventArgs.isTargetable then\n    s.arrive = t\n    s.handsEnd, s.back = t + 20.890, t + 35.594\n    s.stage = 4\n    s.apply()\nend\nif s.stage == 4 then\n    s.hands[eventArgs.entityID] = eventArgs.isTargetable\n    local count, active = 0, 0\n    for _, alive in pairs(s.hands) do\n        count = count + 1\n        if alive then active = active + 1 end\n    end\n    if count >= 2 and active == 0 then\n        s.handsEnd, s.back = t, t + 14.704\n        s.stage = 5\n        s.apply()\n    end\nend\nself.used = true\n",
+							conditions = 
+							{
+								
+								{
+									"1a6fafa5-b1cd-0084-974d-ed2392e065e4",
+									true,
+								},
+								
+								{
+									"fcc4d742-f571-ae3d-9d6a-c1c46e57822a",
+									true,
+								},
+								
+								{
+									"ab8cf0b5-2a4f-f640-9a02-6f72f4dac277",
+									true,
+								},
+								
+								{
+									"682653aa-60e8-8b00-9c4f-c8274aa427f4",
+									true,
+								},
+							},
+							name = "[AutoSim] Follow Abyss hand uptime",
+							uuid = "531a4aa4-55d9-1121-b500-6007852aa80e",
+							version = 2.1,
+						},
+					},
+				},
+				conditions = 
+				{
+					
+					{
+						data = 
+						{
+							category = "Self",
+							conditionType = 14,
+							dequeueIfLuaFalse = true,
+							jobIDList = 
+							{
+								34,
+							},
+							name = "Samurai",
+							uuid = "1a6fafa5-b1cd-0084-974d-ed2392e065e4",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Event",
+							dequeueIfLuaFalse = true,
+							eventArgOptionType = 2,
+							eventEntityContentID = 14094,
+							name = "Hands",
+							uuid = "fcc4d742-f571-ae3d-9d6a-c1c46e57822a",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Lua",
+							conditionLua = "return Argus.getEntityModel(eventArgs.entityID) == 18701",
+							dequeueIfLuaFalse = true,
+							name = "Abyss hand model",
+							uuid = "ab8cf0b5-2a4f-f640-9a02-6f72f4dac277",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Lua",
+							conditionLua = "local s=data.kaptinNecronAutoSim\nreturn s~=nil and s.stage>=3 and s.stage<6",
+							name = "Mandatory Abyss",
+							uuid = "682653aa-60e8-8b00-9c4f-c8274aa427f4",
+							version = 3,
+						},
+					},
+				},
+				displayPath = "AutoSim - Necron adds trial",
+				eventType = 26,
+				loop = true,
+				mechanicTime = 250.8,
+				name = "[AutoSim] Follow Abyss hand uptime",
+				timeRange = true,
+				timelineIndex = 50,
+				timerEndOffset = 149.2,
+				timerStartOffset = -20.8,
+				uuid = "01950e2e-6db5-f5a1-b696-ff4ac9b36a75",
 				version = 2,
 			},
 		},
