@@ -7,17 +7,6 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "527fbaf5-2bac-aab1-e8fd-bf3f5112b785",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-		
-		{
-			data = 
-			{
-				displayPath = "",
 				name = "Shared draw helpers",
 				uuid = "18e0d25f-c77f-9a4b-ac26-b4b956a8daa4",
 			},
@@ -34,7 +23,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "if data.kaptinNecron then self.used=true return end\n-- Pull-scoped renderer and Hector encounter state. APIs are documented in\n-- root_tensorcore.lua, reaping_draw_* and root_draw_update.lua.\nlocal N = {arrows={}, shapes={}, pending={}, handDrops={}, oldHands={}, spectral={}, circleCasts={}, mm=nil}\ndata.kaptinNecron = N\nlocal arrows = TensorCore.getCachedDrawer(0xFF00FFFF,0xFF0088FF,0xFF0000FF,0xFFFFFFFF,2,7)\nlocal friendly = TensorCore.getStaticDrawer(0x7030FF30,1.5,7)\nlocal danger = TensorCore.getMoogleDrawer(6)\nlocal overlay = Argus2.RenderFlags.FLAG_RENDER_OVERLAY\n\nfunction N.slot()\n    if not AnyoneCore or not AnyoneCore.Roster or not AnyoneCore.Roster.current() then return nil end\n    local slot=AnyoneCore.Roster.mySlot()\n    return N.strategy.valid[slot] and slot or nil\nend\nfunction N.clearArrow(key)\n    local a=N.arrows[key]\n    if a then\n        if a.uuid then Argus.deleteTimedShape(a.uuid) end\n        if a.dot then Argus.deleteTimedShape(a.dot);N.shapes[a.dot]=nil end\n        N.arrows[key]=nil\n    end\nend\nfunction N.remember(uuid,ms)\n    if uuid then N.shapes[uuid]=Now()+ms end\n    return uuid\nend\nfunction N.circle(x,z,r,ms,safe)\n    local p=TensorCore.mGetPlayer()\n    return N.remember((safe and friendly or danger):addTimedCircle(ms,x,p.pos.y,z,r,0,false,true),ms)\nend\nfunction N.rect(x,z,length,width,heading,ms)\n    local p=TensorCore.mGetPlayer()\n    return N.remember(danger:addTimedRect(ms,x,p.pos.y,z,length,width,heading,0,false,true),ms)\nend\nfunction N.arrow(x,z,ms,key)\n    if type(x)~=\"number\" or type(z)~=\"number\" or ms<=0 then return end\n    N.clearArrow(key)\n    local a={x=x,z=z,untilAt=Now()+ms,dest={x=x,y=0,z=z}}\n    a.dot=N.circle(x,z,0.6,ms,true)\n    N.arrows[key]=a\n    N.renderArrow(a)\nend\nfunction N.renderArrow(a)\n    local p=TensorCore.mGetPlayer()\n    local dest=a.dest\n    dest.y=p.pos.y\n    local distance=TensorCore.getDistance2d(p.pos,dest)\n    if distance<0.8 then\n        if a.uuid then Argus.deleteTimedShape(a.uuid);a.uuid=nil end\n        return\n    end\n    local ms=a.untilAt-Now()\n    if ms<=0 then return end\n    local head=TensorCore.getHeadingToTarget(p.pos,dest)\n    local tip=math.min(3,distance)\n    local base=math.max(0,distance-tip)\n    if a.uuid and arrows:updateTimedArrow(a.uuid,ms,p.pos.x,p.pos.y,p.pos.z,head,base,1,tip,math.min(3,1+distance/3),0,false,overlay) then return end\n    a.uuid=arrows:addTimedArrow(ms,p.pos.x,p.pos.y,p.pos.z,head,base,1,tip,math.min(3,1+distance/3),0,false,overlay)\nend\nfunction N.defer(key,ms,fn) N.pending[key]={at=Now()+ms,fn=fn} end\nfunction N.update()\n    local now=Now()\n    if not N.nextShapePrune or now>=N.nextShapePrune then\n        N.nextShapePrune=now+1000\n        for uuid,untilAt in pairs(N.shapes) do if now>=untilAt then N.shapes[uuid]=nil end end\n    end\n    for key,a in pairs(N.arrows) do\n        if now>=a.untilAt then N.clearArrow(key) else N.renderArrow(a) end\n    end\n    for key,task in pairs(N.pending) do\n        if now>=task.at then N.pending[key]=nil;task.fn() end\n    end\n    if N.mass and N.mm and N.mm.active then N.mass.guide() end\n    if N.specter and next(N.circleCasts) then N.specter.circleGuide() end\nend\nfunction N.clear()\n    for key in pairs(N.arrows) do N.clearArrow(key) end\n    for uuid in pairs(N.shapes) do Argus.deleteTimedShape(uuid) end\n    N.shapes={};N.nextShapePrune=nil\n    N.pending={}\n    if N.reaping then N.reaping.clear() end\n    if N.gc then N.gc.clear() end\n    if N.mementoDraw then N.mementoDraw.clear() end\n    if N.hands then N.hands.clear() end\n    if N.cold then N.cold.clear() end\n    if N.specter then N.specter.clear() end\n    if N.mass then N.mass.clear() end\nend\n\nlocal function position(e)\n    if e.castPosX and e.castPosZ then return {x=e.castPosX,z=e.castPosZ} end\n    local ent=TensorCore.mGetEntity(e.entityID)\n    return ent and ent.pos or nil\nend\nN.position=position\n\nlocal function wasHit(e,id)\n    for _,v in ipairs(e.hitTargets or {}) do if v==id then return true end end\n    return false\nend\n\nN.wasHit=wasHit\n\nN.strategy=(function()\n-- Pure strategy module. No TensorCore/Minion calls and no drawing side effects.\n-- API glue must feed verified event identities and world geometry.\n-- Load once into the encounter's pull-scoped data table, not a permanent global.\nlocal S = {}\nS.slots = {\"T1\", \"T2\", \"H1\", \"H2\", \"M1\", \"M2\", \"R1\", \"R2\"}\nS.valid = {T1=true,T2=true,H1=true,H2=true,M1=true,M2=true,R1=true,R2=true}\n\nlocal mm = {\n    T1 = {\"four_n\", \"two_wn\", \"corner_nw\"},\n    T2 = {\"four_n\", \"two_en\", \"corner_ne\"},\n    H1 = {\"four_s\", \"two_ws\", \"three_sw\", \"three_se\"},\n    H2 = {\"four_s\", \"two_es\", \"three_ne\", \"three_nw\"},\n    M1 = {\"four_n\", \"two_es\", \"three_ne\", \"three_nw\"},\n    M2 = {\"four_n\", \"two_en\", \"three_ne\", \"three_nw\"},\n    R1 = {\"four_s\", \"two_ws\", \"three_sw\", \"three_se\"},\n    R2 = {\"four_s\", \"two_wn\", \"three_sw\", \"three_se\"},\n}\nlocal portalKeys = {\n    four_n=true, four_s=true,\n    two_wn=true, two_en=true, two_ws=true, two_es=true,\n    three_nw=true, three_ne=true, three_sw=true, three_se=true,\n}\nlocal handIndex = {\n    T1={\"north\",1}, M1={\"north\",2}, M2={\"north\",3}, T2={\"north\",4},\n    R1={\"south\",1}, H1={\"south\",2}, H2={\"south\",3}, R2={\"south\",4},\n}\n\n-- Returns side, vertical band, horizontal seat (1 west, 2 east).\n-- Layout solver must provide actual safe lane and separate spread-safe points.\n-- No hardcoded y/z: hand rows vary, and light-side healers must flex.\nfunction S.mementoSeat(slot, darkSide)\n    if not S.valid[slot] or (darkSide ~= \"west\" and darkSide ~= \"east\") then return nil end\n    if slot == \"T1\" then return darkSide, \"tank_safe_lane\", 1 end\n    if slot == \"T2\" then return darkSide, \"tank_safe_lane\", 2 end\n    local lightSide = darkSide == \"west\" and \"east\" or \"west\"\n    local band = (slot == \"M1\" or slot == \"M2\") and \"north\"\n        or ((slot == \"H1\" or slot == \"H2\") and \"middle\" or \"south\")\n    local seat = (slot == \"M1\" or slot == \"H1\" or slot == \"R1\") and 1 or 2\n    return lightSide, band, seat\nend\n\n-- Custom layout shape: layout[side][band][seat] is a caller-verified safe point.\n-- Hand coverage, arena bounds and spread separation are the caller's contract.\nfunction S.mementoTarget(slot, darkSide, layout)\n    local side, band, seat = S.mementoSeat(slot, darkSide)\n    if not side or not layout or not layout[side] or not layout[side][band] then return nil end\n    return layout[side][band][seat]\nend\n\nfunction S.handAssignment(slot)\n    local a = handIndex[slot]\n    if not a then return nil end\n    return a[1], a[2]\nend\n\n-- Caller supplies exactly the eight confirmed Fear of Death hands of THIS wave.\n-- The caller's normalized records are {id=entityID,x=worldX,z=worldZ}.\n-- Returns the original hand record, never a guessed entity ID.\nfunction S.handForSlot(slot, hands, arenaZ)\n    local row, index = S.handAssignment(slot)\n    if not row or not hands or #hands ~= 8 or type(arenaZ) ~= \"number\" then return nil end\n    local north, south, ids = {}, {}, {}\n    for i=1,8 do\n        local h = hands[i]\n        if not h or h.id == nil or ids[h.id] or type(h.x) ~= \"number\" or type(h.z) ~= \"number\"\n            or h.z == arenaZ then return nil end\n        ids[h.id] = true\n        local dst = h.z < arenaZ and north or south\n        dst[#dst+1] = h\n    end\n    if #north ~= 4 or #south ~= 4 then return nil end\n    local function westFirst(a,b) return a.x < b.x end\n    table.sort(north, westFirst)\n    table.sort(south, westFirst)\n    for i=2,4 do\n        if north[i].x == north[i-1].x or south[i].x == south[i-1].x then return nil end\n    end\n    return (row == \"north\" and north or south)[index]\nend\n\n-- For P2 opening giant hands: identical row/seat assignment, translated into\n-- the verified remaining horizontal safe lane. Root supplies two rows of points.\nfunction S.p2SpreadTarget(slot, safeLaneLayout)\n    local row, index = S.handAssignment(slot)\n    if not row or not safeLaneLayout or not safeLaneLayout[row] then return nil end\n    return safeLaneLayout[row][index]\nend\n\nfunction S.massRoute(slot) return mm[slot] end\n\nfunction S.newMassState()\n    return {active=true, completed={}, handsResolved=false, firstBuster=false, secondBuster=false}\nend\n\n-- These event strings are PRIVATE module contracts, not game/MCP event names.\n-- Root translates only verified packet IDs and belongs-to-this-occurrence events.\n-- portalKey identifies the exact fixed portal; don't advance on a generic cast.\nfunction S.massEvent(state, event, portalKey)\n    if not state or not state.active then return false end\n    if event == \"portal_resolved\" then\n        if not portalKeys[portalKey] then return false end\n        state.completed[portalKey] = true\n    elseif event == \"memento_hands_resolved\" then\n        state.handsResolved = true\n    elseif event == \"first_buster_resolved\" then\n        state.firstBuster = true\n    elseif event == \"second_buster_resolved\" then\n        state.secondBuster = true\n    elseif event == \"end\" then\n        state.active = false\n    else return false end\n    return true\nend\n\n-- Returns semantic destination key, instruction, phase.\n-- Caller must supply safe staging geometry for \"hold_\" keys outside portals,\n-- and actual safe hand-lane geometry for \"hands_west\"/\"hands_east\".\n-- vulnGone must be explicitly true after checking the REAL buff (nil is unknown).\nfunction S.massTarget(slot, state, vulnGone)\n    local route = mm[slot]\n    if not route or not state or not state.active then return nil end\n    if not state.completed[route[1]] then\n        return route[1], \"SOAK 4\", \"four\"\n    end\n    if not state.completed[route[2]] then\n        if vulnGone ~= true then return \"hold_\"..route[2], \"WAIT FOR VULN\", \"two_wait\" end\n        return route[2], \"SOAK 2\", \"two\"\n    end\n    if not state.handsResolved then\n        local west = route[2] == \"two_wn\" or route[2] == \"two_ws\"\n        return west and \"hands_west\" or \"hands_east\", \"DODGE HANDS\", \"hands\"\n    end\n    if slot == \"T1\" or slot == \"T2\" then\n        if state.secondBuster then return nil end\n        return route[3], \"BAIT BUSTER\", \"buster\"\n    end\n    if not state.completed[route[3]] then\n        if vulnGone ~= true then return \"hold_\"..route[3], \"WAIT FOR VULN\", \"three_first_wait\" end\n        return route[3], \"SOAK 3\", \"three_first\"\n    end\n    if not state.firstBuster then return route[3], \"WAIT FOR FIRST BUSTER\", \"cross_wait\" end\n    if not state.completed[route[4]] then\n        if vulnGone ~= true then return \"hold_\"..route[4], \"WAIT FOR VULN\", \"three_second_wait\" end\n        -- For three_se the point must be its WEST/inside half, not center.\n        return route[4], \"SOAK 3\", \"three_second\"\n    end\n    return nil\nend\n\nreturn S\n\nend)()\nself.used=true",
+							actionLua = "if data.kaptinNecron then self.used=true return end\n-- Pull-scoped renderer and Hector encounter state. APIs are documented in\n-- root_tensorcore.lua, reaping_draw_* and root_draw_update.lua.\nlocal N = {arrows={}, shapes={}, pending={}, handDrops={}, oldHands={}, spectral={}, circleCasts={}, mm=nil}\ndata.kaptinNecron = N\nlocal arrows = TensorCore.getCachedDrawer(0xFF00FFFF,0xFF0088FF,0xFF0000FF,0xFFFFFFFF,2,7)\nlocal friendly = TensorCore.getStaticDrawer(0x7030FF30,1.5,7)\nlocal danger = TensorCore.getMoogleDrawer(6)\nlocal overlay = Argus2.RenderFlags.FLAG_RENDER_OVERLAY\n\nfunction N.slot()\n    if not AnyoneCore or not AnyoneCore.Roster or not AnyoneCore.Roster.current() then return nil end\n    local slot=AnyoneCore.Roster.mySlot()\n    return N.strategy.valid[slot] and slot or nil\nend\nfunction N.clearArrow(key)\n    local a=N.arrows[key]\n    if a then\n        if a.uuid then Argus.deleteTimedShape(a.uuid) end\n        if a.dot then Argus.deleteTimedShape(a.dot);N.shapes[a.dot]=nil end\n        N.arrows[key]=nil\n    end\nend\nfunction N.remember(uuid,ms)\n    if uuid then N.shapes[uuid]=Now()+ms end\n    return uuid\nend\nfunction N.circle(x,z,r,ms,safe)\n    local p=TensorCore.mGetPlayer()\n    return N.remember((safe and friendly or danger):addTimedCircle(ms,x,p.pos.y,z,r,0,false,true),ms)\nend\nfunction N.rect(x,z,length,width,heading,ms)\n    local p=TensorCore.mGetPlayer()\n    return N.remember(danger:addTimedRect(ms,x,p.pos.y,z,length,width,heading,0,false,true),ms)\nend\nfunction N.arrow(x,z,ms,key)\n    if type(x)~=\"number\" or type(z)~=\"number\" or ms<=0 then return end\n    N.clearArrow(key)\n    local a={x=x,z=z,untilAt=Now()+ms,dest={x=x,y=0,z=z}}\n    a.dot=N.circle(x,z,0.6,ms,true)\n    N.arrows[key]=a\n    N.renderArrow(a)\nend\nfunction N.renderArrow(a)\n    local p=TensorCore.mGetPlayer()\n    local dest=a.dest\n    dest.y=p.pos.y\n    local distance=TensorCore.getDistance2d(p.pos,dest)\n    if distance<0.8 then\n        if a.uuid then Argus.deleteTimedShape(a.uuid);a.uuid=nil end\n        return\n    end\n    local ms=a.untilAt-Now()\n    if ms<=0 then return end\n    local head=TensorCore.getHeadingToTarget(p.pos,dest)\n    local tip=math.min(3,distance)\n    local base=math.max(0,distance-tip)\n    if a.uuid and arrows:updateTimedArrow(a.uuid,ms,p.pos.x,p.pos.y,p.pos.z,head,base,1,tip,math.min(3,1+distance/3),0,false,overlay) then return end\n    a.uuid=arrows:addTimedArrow(ms,p.pos.x,p.pos.y,p.pos.z,head,base,1,tip,math.min(3,1+distance/3),0,false,overlay)\nend\nfunction N.defer(key,ms,fn) N.pending[key]={at=Now()+ms,fn=fn} end\nfunction N.update()\n    local now=Now()\n    if not N.nextShapePrune or now>=N.nextShapePrune then\n        N.nextShapePrune=now+1000\n        for uuid,untilAt in pairs(N.shapes) do if now>=untilAt then N.shapes[uuid]=nil end end\n    end\n    for key,a in pairs(N.arrows) do\n        if now>=a.untilAt then N.clearArrow(key) else N.renderArrow(a) end\n    end\n    for key,task in pairs(N.pending) do\n        if now>=task.at then N.pending[key]=nil;task.fn() end\n    end\n    if N.reaping then N.reaping.updateRotation() end\n    if N.mass and N.mm and N.mm.active then N.mass.guide() end\n    if N.specter and next(N.circleCasts) then N.specter.circleGuide() end\nend\nfunction N.clear()\n    for key in pairs(N.arrows) do N.clearArrow(key) end\n    for uuid in pairs(N.shapes) do Argus.deleteTimedShape(uuid) end\n    N.shapes={};N.nextShapePrune=nil\n    N.pending={}\n    if N.reaping then N.reaping.clear() end\n    if N.gc then N.gc.clear() end\n    if N.mementoDraw then N.mementoDraw.clear() end\n    if N.hands then N.hands.clear() end\n    if N.cold then N.cold.clear() end\n    if N.specter then N.specter.clear() end\n    if N.mass then N.mass.clear() end\nend\n\nlocal function position(e)\n    if e.castPosX and e.castPosZ then return {x=e.castPosX,z=e.castPosZ} end\n    local ent=TensorCore.mGetEntity(e.entityID)\n    return ent and ent.pos or nil\nend\nN.position=position\n\nlocal function wasHit(e,id)\n    for _,v in ipairs(e.hitTargets or {}) do if v==id then return true end end\n    return false\nend\n\nN.wasHit=wasHit\n\nN.strategy=(function()\n-- Pure strategy module. No TensorCore/Minion calls and no drawing side effects.\n-- API glue must feed verified event identities and world geometry.\n-- Load once into the encounter's pull-scoped data table, not a permanent global.\nlocal S = {}\nS.slots = {\"T1\", \"T2\", \"H1\", \"H2\", \"M1\", \"M2\", \"R1\", \"R2\"}\nS.valid = {T1=true,T2=true,H1=true,H2=true,M1=true,M2=true,R1=true,R2=true}\n\nlocal mm = {\n    T1 = {\"four_n\", \"two_wn\", \"corner_nw\"},\n    T2 = {\"four_n\", \"two_en\", \"corner_ne\"},\n    H1 = {\"four_s\", \"two_ws\", \"three_sw\", \"three_se\"},\n    H2 = {\"four_s\", \"two_es\", \"three_ne\", \"three_nw\"},\n    M1 = {\"four_n\", \"two_es\", \"three_ne\", \"three_nw\"},\n    M2 = {\"four_n\", \"two_en\", \"three_ne\", \"three_nw\"},\n    R1 = {\"four_s\", \"two_ws\", \"three_sw\", \"three_se\"},\n    R2 = {\"four_s\", \"two_wn\", \"three_sw\", \"three_se\"},\n}\nlocal portalKeys = {\n    four_n=true, four_s=true,\n    two_wn=true, two_en=true, two_ws=true, two_es=true,\n    three_nw=true, three_ne=true, three_sw=true, three_se=true,\n}\nlocal handIndex = {\n    T1={\"north\",1}, M1={\"north\",2}, M2={\"north\",3}, T2={\"north\",4},\n    R1={\"south\",1}, H1={\"south\",2}, H2={\"south\",3}, R2={\"south\",4},\n}\n\n-- Returns side, vertical band, horizontal seat (1 west, 2 east).\n-- Layout solver must provide actual safe lane and separate spread-safe points.\n-- No hardcoded y/z: hand rows vary, and light-side healers must flex.\nfunction S.mementoSeat(slot, darkSide)\n    if not S.valid[slot] or (darkSide ~= \"west\" and darkSide ~= \"east\") then return nil end\n    if slot == \"T1\" then return darkSide, \"tank_safe_lane\", 1 end\n    if slot == \"T2\" then return darkSide, \"tank_safe_lane\", 2 end\n    local lightSide = darkSide == \"west\" and \"east\" or \"west\"\n    local band = (slot == \"M1\" or slot == \"M2\") and \"north\"\n        or ((slot == \"H1\" or slot == \"H2\") and \"middle\" or \"south\")\n    local seat = (slot == \"M1\" or slot == \"H1\" or slot == \"R1\") and 1 or 2\n    return lightSide, band, seat\nend\n\n-- Custom layout shape: layout[side][band][seat] is a caller-verified safe point.\n-- Hand coverage, arena bounds and spread separation are the caller's contract.\nfunction S.mementoTarget(slot, darkSide, layout)\n    local side, band, seat = S.mementoSeat(slot, darkSide)\n    if not side or not layout or not layout[side] or not layout[side][band] then return nil end\n    return layout[side][band][seat]\nend\n\nfunction S.handAssignment(slot)\n    local a = handIndex[slot]\n    if not a then return nil end\n    return a[1], a[2]\nend\n\n-- Caller supplies exactly the eight confirmed Fear of Death hands of THIS wave.\n-- The caller's normalized records are {id=entityID,x=worldX,z=worldZ}.\n-- Returns the original hand record, never a guessed entity ID.\nfunction S.handForSlot(slot, hands, arenaZ)\n    local row, index = S.handAssignment(slot)\n    if not row or not hands or #hands ~= 8 or type(arenaZ) ~= \"number\" then return nil end\n    local north, south, ids = {}, {}, {}\n    for i=1,8 do\n        local h = hands[i]\n        if not h or h.id == nil or ids[h.id] or type(h.x) ~= \"number\" or type(h.z) ~= \"number\"\n            or h.z == arenaZ then return nil end\n        ids[h.id] = true\n        local dst = h.z < arenaZ and north or south\n        dst[#dst+1] = h\n    end\n    if #north ~= 4 or #south ~= 4 then return nil end\n    local function westFirst(a,b) return a.x < b.x end\n    table.sort(north, westFirst)\n    table.sort(south, westFirst)\n    for i=2,4 do\n        if north[i].x == north[i-1].x or south[i].x == south[i-1].x then return nil end\n    end\n    return (row == \"north\" and north or south)[index]\nend\n\n-- For P2 opening giant hands: identical row/seat assignment, translated into\n-- the verified remaining horizontal safe lane. Root supplies two rows of points.\nfunction S.p2SpreadTarget(slot, safeLaneLayout)\n    local row, index = S.handAssignment(slot)\n    if not row or not safeLaneLayout or not safeLaneLayout[row] then return nil end\n    return safeLaneLayout[row][index]\nend\n\nfunction S.massRoute(slot) return mm[slot] end\n\nfunction S.newMassState()\n    return {active=true, completed={}, handsResolved=false, firstBuster=false, secondBuster=false}\nend\n\n-- These event strings are PRIVATE module contracts, not game/MCP event names.\n-- Root translates only verified packet IDs and belongs-to-this-occurrence events.\n-- portalKey identifies the exact fixed portal; don't advance on a generic cast.\nfunction S.massEvent(state, event, portalKey)\n    if not state or not state.active then return false end\n    if event == \"portal_resolved\" then\n        if not portalKeys[portalKey] then return false end\n        state.completed[portalKey] = true\n    elseif event == \"memento_hands_resolved\" then\n        state.handsResolved = true\n    elseif event == \"first_buster_resolved\" then\n        state.firstBuster = true\n    elseif event == \"second_buster_resolved\" then\n        state.secondBuster = true\n    elseif event == \"end\" then\n        state.active = false\n    else return false end\n    return true\nend\n\n-- Returns semantic destination key, instruction, phase.\n-- Caller must supply safe staging geometry for \"hold_\" keys outside portals,\n-- and actual safe hand-lane geometry for \"hands_west\"/\"hands_east\".\n-- vulnGone must be explicitly true after checking the REAL buff (nil is unknown).\nfunction S.massTarget(slot, state, vulnGone)\n    local route = mm[slot]\n    if not route or not state or not state.active then return nil end\n    if not state.completed[route[1]] then\n        return route[1], \"SOAK 4\", \"four\"\n    end\n    if not state.completed[route[2]] then\n        if vulnGone ~= true then return \"hold_\"..route[2], \"WAIT FOR VULN\", \"two_wait\" end\n        return route[2], \"SOAK 2\", \"two\"\n    end\n    if not state.handsResolved then\n        local west = route[2] == \"two_wn\" or route[2] == \"two_ws\"\n        return west and \"hands_west\" or \"hands_east\", \"DODGE HANDS\", \"hands\"\n    end\n    if slot == \"T1\" or slot == \"T2\" then\n        if state.secondBuster then return nil end\n        return route[3], \"BAIT BUSTER\", \"buster\"\n    end\n    if not state.completed[route[3]] then\n        if vulnGone ~= true then return \"hold_\"..route[3], \"WAIT FOR VULN\", \"three_first_wait\" end\n        return route[3], \"SOAK 3\", \"three_first\"\n    end\n    if not state.firstBuster then return route[3], \"WAIT FOR FIRST BUSTER\", \"cross_wait\" end\n    if not state.completed[route[4]] then\n        if vulnGone ~= true then return \"hold_\"..route[4], \"WAIT FOR VULN\", \"three_second_wait\" end\n        -- For three_se the point must be its WEST/inside half, not center.\n        return route[4], \"SOAK 3\", \"three_second\"\n    end\n    return nil\nend\n\nreturn S\n\nend)()\nself.used=true",
 							name = "[Setup] Shared LJ renderer and roster",
 							uuid = "7d486eab-4cd9-ebf5-9660-9efb3b07f852",
 							version = 2.1,
@@ -298,33 +287,8 @@ local tbl =
 			},
 		},
 	},
-	[6] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "5d277c09-a2a2-999d-61fd-1be3cc11b219",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
 	[7] = 
 	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "c5848f3a-e25e-94be-a028-a21469224f0a",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
 		
 		{
 			data = 
@@ -502,17 +466,6 @@ local tbl =
 	},
 	[9] = 
 	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "e56747c0-e479-160c-ad6d-8876be9b50d0",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
 		
 		{
 			data = 
@@ -786,17 +739,6 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "04e9dc9e-806c-95b2-86ac-9414c7fbd2ae",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-		
-		{
-			data = 
-			{
-				displayPath = "",
 				name = "Hector helpers",
 				uuid = "6e302db2-963a-c4d9-bb9c-43e1cc4e2b61",
 			},
@@ -813,7 +755,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "local base=data.kaptinNecron\nif not base then return end\nif base.reaping then self.used=true return end\n-- Draft initializer for root integration. No engine callback registration.\n-- Calls are made only from TensorReactions native event actions.\n-- Verified sources and exact IDs: necron_events.md; live get_actions:\n-- reaping_action_verify.json. Public API definitions: reaping_draw_*.lua.\n-- Each native event action should invoke the matching module function then\n-- set self.used=true. All state is private to this pull-scoped data table.\n\nlocal M = {}\ndata.kaptinNecronReaping = M\n\nlocal shapes = {[604] = \"out\", [605] = \"in\", [606] = \"middle\", [607] = \"sides\"}\nlocal hits = {[45183] = \"out\", [45184] = \"in\", [44608] = \"middle\", [45185] = \"sides\"}\nlocal releaseGroups = {[44557] = 2, [44558] = 4, [45167] = 2, [45168] = 4}\nlocal s = {order = {}, shapeDraws = {}, stackDraws = {}, count = 0}\nM.state = s\n\n-- Optional root-owned hooks, not game API calls:\n-- M.guide(shape, groups, durationMs, finalShape): draw a verified Hector\n-- role position using the shared LJ arrow helper. No assumed role layout here.\n-- M.clearGuide(): remove only this module's currently-owned arrow/marker.\n-- M.stackAnchorSlots(groups): canonical roster slots whose cone axes are the\n-- agreed party assignment. Defaults are Hector's two healer groups or the\n-- support anchors T1/M1, T2/M2, H1/R1, H2/R2. Friendly cones are guides, NOT a\n-- claim about which support/DPS the enemy randomly selected this time.\n-- M.rotation(offset): may only be invoked from separately verified rotation\n-- evidence; does NOT assume Minion aura fields map to BossMod modelState.\n\nlocal function removeDraws(list)\n    for i = 1, #list do\n        Argus.deleteTimedShape(list[i])\n    end\n    for i = #list, 1, -1 do list[i] = nil end\nend\n\nlocal function keep(list, uuid)\n    if uuid ~= nil then list[#list + 1] = uuid end\nend\n\nfunction M.clear()\n    removeDraws(s.shapeDraws)\n    removeDraws(s.stackDraws)\n    if M.clearGuide then M.clearGuide() end\n    s.active, s.rotated, s.collecting = false, false, false\n    s.order, s.activeOrder = {}, nil\n    s.groups, s.count, s.expected, s.bossID = nil, 0, nil, nil\n    s.lastHitAt, s.lastHitShape, s.lastChannelAt, s.lastChannelShape = nil, nil, nil, nil\nend\n\nlocal function drawShape(shape, duration)\n    removeDraws(s.shapeDraws)\n    local boss = s.bossID and TensorCore.mGetEntity(s.bossID)\n    if boss == nil or duration <= 0 then return end\n    local d = TensorCore.getMoogleDrawer(6)\n    if shape == \"out\" then\n        keep(s.shapeDraws, d:addTimedCircleOnEnt(duration, boss.id, 20, 0, false, true))\n    elseif shape == \"in\" then\n        keep(s.shapeDraws, d:addTimedDonutOnEnt(duration, boss.id, 16, 60, 0, false, true))\n    elseif shape == \"middle\" then\n        local heading = TensorCore.getHeadingToTarget({x=88,z=85}, {x=88,z=115})\n        keep(s.shapeDraws, d:addTimedRect(duration, 88, boss.pos.y, 85, 100, 12, heading, 0, false, true))\n        keep(s.shapeDraws, d:addTimedRect(duration, 112, boss.pos.y, 85, 100, 12, heading, 0, false, true))\n    elseif shape == \"sides\" then\n        local heading = TensorCore.getHeadingToTarget({x=100,z=85}, {x=100,z=115})\n        keep(s.shapeDraws, d:addTimedRect(duration, 100, boss.pos.y, 85, 100, 12, heading, 0, false, true))\n    end\n    if M.guide then M.guide(shape, s.groups, duration, s.count + 1 == s.expected) end\nend\n\nlocal function drawStacks(duration)\n    removeDraws(s.stackDraws)\n    if not (s.bossID and s.groups and AnyoneCore and AnyoneCore.Roster) then return end\n    local slots\n    if M.stackAnchorSlots then\n        slots = M.stackAnchorSlots(s.groups)\n    elseif s.groups == 2 then\n        slots = {\"H1\", \"H2\"}\n    elseif s.groups == 4 then\n        slots = {\"T1\", \"T2\", \"H1\", \"H2\"}\n    end\n    if slots == nil then return end\n    -- Green positioning cones, doNotDetect=true, never influence movement.\n    local d = TensorCore.getStaticDrawer(0x3030FF30, 1.5, 7)\n    for i = 1, #slots do\n        local id = AnyoneCore.Roster.idOf(slots[i])\n        if id ~= nil and TensorCore.mGetEntity(id) ~= nil then\n            keep(s.stackDraws, d:addTimedConeOnEnt(duration, s.bossID, 100,\n                math.rad(20), id, 0, false, true))\n        end\n    end\nend\n\nfunction M.rotation(offset)\n    if s.expected ~= 4 or s.count ~= 0 or #s.order ~= 4 then return false end\n    if offset ~= 0 and offset ~= 1 and offset ~= 2 and offset ~= 3 then return false end\n    s.activeOrder = {}\n    for i = 1, 4 do s.activeOrder[i] = s.order[((i + offset - 1) % 4) + 1] end\n    s.rotated = true\n    return true\nend\n\nfunction M.onMarker(e)\n    local shape = shapes[e.markerID]\n    if shape == nil or not s.collecting or e.entityID ~= s.bossID then return end\n    if #s.order >= s.expected then return end\n    s.order[#s.order + 1] = shape\nend\n\nfunction M.onChannel(e)\n    local id = e.spellID\n    if id == 44556 or id == 44564 then\n        M.clear()\n        s.bossID, s.expected, s.collecting = e.entityID, (id == 44564 and 4 or 1), true\n        return\n    end\n\n    local groups = releaseGroups[id]\n    if groups ~= nil then\n        if s.bossID ~= e.entityID then return end\n        s.collecting, s.active, s.groups, s.count = false, true, groups, 0\n        s.lastHitAt, s.lastHitShape, s.lastChannelAt, s.lastChannelShape = nil, nil, nil, nil\n        local duration = math.max(0, e.channelTimeMax) * 1000\n        if id == 44557 or id == 44558 then\n            s.expected = 1\n            if #s.order == 1 then\n                s.activeOrder = {s.order[1]}\n                drawShape(s.order[1], duration + 1350)\n            end\n            drawStacks(duration + 1450)\n        else\n            s.expected = 4\n            -- Without proven early rotation data, wait for first actual helper\n            -- cast. All four stored icons are still retained for later steps.\n            if s.rotated and s.activeOrder ~= nil then\n                drawShape(s.activeOrder[1], duration + 1350)\n            end\n        end\n        return\n    end\n\n    local shape = hits[id]\n    if shape == nil or not s.active then return end\n    local now = Now()\n    -- Two side-lane helpers are one shape. Repeated handler delivery is also\n    -- ignored; successive legitimate shapes are ~2.9s apart.\n    if s.lastChannelShape == shape and s.lastChannelAt and now - s.lastChannelAt < 800 then return end\n    s.lastChannelAt, s.lastChannelShape = now, shape\n\n    if s.expected == 4 and s.count == 0 and not s.rotated then\n        local match, matches = nil, 0\n        for i = 1, #s.order do\n            if s.order[i] == shape then match, matches = i, matches + 1 end\n        end\n        if #s.order == 4 and matches == 1 then M.rotation(match - 1) end\n    end\n    -- A mismatch invalidates future predictions; observed geometry still works.\n    if s.activeOrder and s.activeOrder[s.count + 1] ~= shape then\n        s.activeOrder, s.rotated = nil, false\n    end\n    drawShape(shape, math.max(0, e.channelTimeMax) * 1000 + 150)\n    if s.count + 1 == s.expected then drawStacks(math.max(0, e.channelTimeMax) * 1000 + 250) end\nend\n\nfunction M.onCast(e)\n    if e.spellID == 44559 or e.spellID == 44560 then\n        removeDraws(s.stackDraws)\n        if M.clearGuide then M.clearGuide() end\n        s.active = false\n        return\n    end\n    local shape = hits[e.spellID]\n    if shape == nil or not s.active then return end\n    local now = Now()\n    if s.lastHitShape == shape and s.lastHitAt and now - s.lastHitAt < 800 then return end\n    s.lastHitAt, s.lastHitShape = now, shape\n    removeDraws(s.shapeDraws)\n    s.count = s.count + 1\n    if s.count < s.expected and s.activeOrder ~= nil then\n        local nextShape = s.activeOrder[s.count + 1]\n        if nextShape ~= nil then\n            -- Expected interval only bounds a preview; the next channel resets\n            -- it to the real observed cast deadline.\n            drawShape(nextShape, 3000)\n            if s.count + 1 == s.expected then drawStacks(3100) end\n        end\n    end\nend\n\n-- Conservative Hector destination planner, evaluated once per stage/cue.\n-- Sources establish IN<16, OUT>20 and middle/sides at x94/106. One-yalm\n-- margins produce IN+middle intersection or OUT+sides intersection; thus the\n-- same agreed layout works regardless of which of those two shapes is stored.\n-- No actor location is assumed: use the live boss position supplied by caller.\n-- Pair axes are at least22deg apart for20deg full cones. Tanks/melees use the\n-- northern point on the outer axes, healers/ranged the southern inner axes.\nfunction M.rolePoints(bossPos, shape, groups)\n    local inside = shape == \"in\" or shape == \"middle\"\n    if not inside and shape ~= \"out\" and shape ~= \"sides\" then return nil end\n    if groups ~= 2 and groups ~= 4 then return nil end\n    local bx,bz = bossPos.x,bossPos.z\n    local function ray(angle, side, far)\n        local radians=math.rad(angle*side)\n        local dx,dz=math.sin(radians),math.cos(radians)\n        local xMin,xMax\n        if inside then xMin,xMax=95,105\n        elseif side<0 then xMin,xMax=83,93\n        else xMin,xMax=107,117 end\n        local lo,hi=0,math.huge\n        local function slab(origin,direction,low,high)\n            if math.abs(direction)<0.000001 then return origin>=low and origin<=high end\n            local a,b=(low-origin)/direction,(high-origin)/direction\n            if a>b then a,b=b,a end\n            lo,hi=math.max(lo,a),math.min(hi,b)\n            return lo<=hi\n        end\n        if not slab(bx,dx,xMin,xMax) or not slab(bz,dz,86,114) then return nil end\n        if inside then hi=math.min(hi,15) else lo=math.max(lo,21) end\n        if lo>hi or hi<=0 then return nil end\n        local r=far and hi or lo\n        return {x=bx+r*dx,z=bz+r*dz,radius=r,angle=angle*side}\n    end\n    local best,bestScore\n    if groups==2 then\n        for a=12,70 do\n            local left,right=ray(a,-1,false),ray(a,1,false)\n            if left and right then\n                local score=math.abs(a-(inside and 25 or 40))+(left.radius+right.radius)*0.2\n                if not bestScore or score<bestScore then\n                    bestScore=score\n                    best={T1=left,H1=left,M1=left,R1=left,T2=right,H2=right,M2=right,R2=right}\n                end\n            end\n        end\n    else\n        for h=11,40 do\n            local lh,rh=ray(h,-1,true),ray(h,1,true)\n            if lh and rh then\n                for t=h+22,80 do\n                    local lt,rt=ray(t,-1,false),ray(t,1,false)\n                    if lt and rt and lt.z+1<=lh.z and rt.z+1<=rh.z then\n                        local score=math.abs(h-15)+math.abs(t-(inside and 35 or 50))*0.25\n                            +(lt.radius+rt.radius)*0.8\n                        if not bestScore or score<bestScore then\n                            bestScore=score\n                            best={T1=lt,M1=lt,T2=rt,M2=rt,H1=lh,R1=lh,H2=rh,R2=rh}\n                        end\n                    end\n                end\n            end\n        end\n    end\n    -- If the actual boss position makes these conservative regions infeasible,\n    -- do not invent a destination. Enemy AoE draws still remain available.\n    return best\nend\n\nfunction M.rolePoint(bossPos, shape, groups, slot)\n    local all=M.rolePoints(bossPos,shape,groups)\n    return all and all[slot] or nil\nend\n\n-- Root wrapper calls M.clear() on OnWipe/countdown cancellation as appropriate.\n-- Do not save or claim early Relentless rotation prediction until the missing\n-- Minion aura/model-state correspondence has been established from evidence.\nself.used = true\n\nlocal N=data.kaptinNecron\nN.reaping=data.kaptinNecronReaping\nN.reaping.clearGuide=function() N.clearArrow(\"reaping\") end\nN.reaping.guide=function(shape,groups,ms)\n    local slot=N.slot()\n    local boss=N.reaping.state.bossID and TensorCore.mGetEntity(N.reaping.state.bossID)\n    if not slot or not boss then N.clearArrow(\"reaping\");return end\n    local p=N.reaping.rolePoint(boss.pos,shape,groups or 2,slot)\n    if p then N.arrow(p.x,p.z,ms,\"reaping\") else N.clearArrow(\"reaping\") end\nend\nself.used=true",
+							actionLua = "local base=data.kaptinNecron\nif not base then return end\nif base.reaping then self.used=true return end\n-- Draft initializer for root integration. No engine callback registration.\n-- Calls are made only from TensorReactions native event actions.\n-- Verified sources and exact IDs: necron_events.md; live get_actions:\n-- reaping_action_verify.json. Public API definitions: reaping_draw_*.lua.\n-- Each native event action should invoke the matching module function then\n-- set self.used=true. All state is private to this pull-scoped data table.\n\nlocal M = {}\ndata.kaptinNecronReaping = M\n\nlocal shapes = {[604] = \"out\", [605] = \"in\", [606] = \"middle\", [607] = \"sides\"}\nlocal hits = {[45183] = \"out\", [45184] = \"in\", [44608] = \"middle\", [45185] = \"sides\"}\nlocal releaseGroups = {[44557] = 2, [44558] = 4, [45167] = 2, [45168] = 4}\nlocal s = {order = {}, shapeDraws = {}, stackDraws = {}, count = 0, rotationActors = {}, rotationSeen = {}}\nlocal labels = {['in']='IN', out='OUT', middle='MID SAFE', sides='SIDES SAFE'}\nM.state = s\n\n-- Optional root-owned hooks, not game API calls:\n-- M.guide(shape, groups, durationMs, finalShape): draw a verified Hector\n-- role position using the shared LJ arrow helper. No assumed role layout here.\n-- M.clearGuide(): remove only this module's currently-owned arrow/marker.\n-- M.stackAnchorSlots(groups): canonical roster slots whose cone axes are the\n-- agreed party assignment. Defaults are Hector's two healer groups or the\n-- support anchors T1/M1, T2/M2, H1/R1, H2/R2. Friendly cones are guides, NOT a\n-- claim about which support/DPS the enemy randomly selected this time.\n-- M.rotation(offset): may only be invoked from separately verified rotation\n-- evidence; does NOT assume Minion aura fields map to BossMod modelState.\n\nlocal function removeDraws(list)\n    for i = 1, #list do\n        Argus.deleteTimedShape(list[i])\n    end\n    for i = #list, 1, -1 do list[i] = nil end\nend\n\nlocal function keep(list, uuid)\n    if uuid ~= nil then list[#list + 1] = uuid end\nend\n\nfunction M.clear()\n    removeDraws(s.shapeDraws)\n    removeDraws(s.stackDraws)\n    if M.clearGuide then M.clearGuide() end\n    s.active, s.rotated, s.collecting = false, false, false\n    s.rotationActors, s.rotationUntil, s.noticeKey = {}, nil, nil\n    s.shape, s.step, s.sequenceText = nil, nil, nil\n    s.order, s.activeOrder = {}, nil\n    s.groups, s.count, s.expected, s.bossID = nil, 0, nil, nil\n    s.lastHitAt, s.lastHitShape, s.lastChannelAt, s.lastChannelShape = nil, nil, nil, nil\nend\n\nlocal function drawShape(shape, duration)\n    removeDraws(s.shapeDraws)\n    removeDraws(s.stackDraws)\n    if M.clearGuide then M.clearGuide() end\n    local boss = s.bossID and TensorCore.mGetEntity(s.bossID)\n    if boss == nil or duration <= 0 then return end\n    local d = TensorCore.getMoogleDrawer(6)\n    if shape == \"out\" then\n        keep(s.shapeDraws, d:addTimedCircleOnEnt(duration, boss.id, 20, 0, false, true))\n    elseif shape == \"in\" then\n        keep(s.shapeDraws, d:addTimedDonutOnEnt(duration, boss.id, 16, 60, 0, false, true))\n    elseif shape == \"middle\" then\n        local heading = TensorCore.getHeadingToTarget({x=88,z=85}, {x=88,z=115})\n        keep(s.shapeDraws, d:addTimedRect(duration, 88, boss.pos.y, 85, 100, 12, heading, 0, false, true))\n        keep(s.shapeDraws, d:addTimedRect(duration, 112, boss.pos.y, 85, 100, 12, heading, 0, false, true))\n    elseif shape == \"sides\" then\n        local heading = TensorCore.getHeadingToTarget({x=100,z=85}, {x=100,z=115})\n        keep(s.shapeDraws, d:addTimedRect(duration, 100, boss.pos.y, 85, 100, 12, heading, 0, false, true))\n    end\n    s.shape, s.step = shape, s.count + 1\n    local key = tostring(s.step)..\":\"..shape\n    if s.noticeKey ~= key then\n        s.noticeKey = key\n        local parts = {}\n        for i=s.step,s.expected do\n            local nextShape = s.activeOrder and s.activeOrder[i] or (i==s.step and shape or nil)\n            if nextShape then parts[#parts+1] = tostring(i)..\"-\"..labels[nextShape] end\n        end\n        s.sequenceText = table.concat(parts, \" > \")\n        if s.step==s.expected then\n            s.sequenceText=s.sequenceText..(s.groups==4 and \" + PAIRS\" or \" + STACKS\")\n        end\n        TensorCore.addAlertText(math.min(duration,2500),s.sequenceText,1.2,2,false)\n    end\n    if M.guide then M.guide(shape, s.groups, duration, s.count + 1 == s.expected) end\nend\n\nlocal function drawStacks(duration)\n    removeDraws(s.stackDraws)\n    if not (s.bossID and s.groups and AnyoneCore and AnyoneCore.Roster) then return end\n    local slots\n    if M.stackAnchorSlots then\n        slots = M.stackAnchorSlots(s.groups)\n    elseif s.groups == 2 then\n        slots = {\"H1\", \"H2\"}\n    elseif s.groups == 4 then\n        slots = {\"T1\", \"T2\", \"H1\", \"H2\"}\n    end\n    if slots == nil then return end\n    -- Green positioning cones, doNotDetect=true, never influence movement.\n    local d = TensorCore.getStaticDrawer(0x3030FF30, 1.5, 7)\n    for i = 1, #slots do\n        local id = AnyoneCore.Roster.idOf(slots[i])\n        if id ~= nil and TensorCore.mGetEntity(id) ~= nil then\n            keep(s.stackDraws, d:addTimedConeOnEnt(duration, s.bossID, 100,\n                math.rad(20), id, 0, false, true))\n        end\n    end\nend\n\nfunction M.rotation(offset)\n    if s.expected ~= 4 or s.count ~= 0 or #s.order ~= 4 then return false end\n    if offset ~= 0 and offset ~= 1 and offset ~= 2 and offset ~= 3 then return false end\n    s.activeOrder = {}\n    for i = 1, 4 do s.activeOrder[i] = s.order[((i + offset - 1) % 4) + 1] end\n    s.rotated = true\n    return true\nend\n\n-- The four tether source IDs are observed in this mechanic. Their identity is\n-- only used to bound the lookup; no order is inferred from entity IDs/tethers.\n-- Public Cactbot Crop Circle logic establishes status 2056's counts 0x3B8..BB\n-- and the single bottom actor (height < 5). Minion exposes status count as stacks.\nfunction M.onTether(e)\n    if s.expected~=4 or not s.collecting or e.newTargetID~=s.bossID then return end\n    s.rotationActors[e.sourceEntityID]=true\nend\n\nfunction M.tryRotation()\n    if s.expected~=4 or #s.order~=4 or s.count~=0 then return false end\n    local count,bottom,seen=0,nil,s.rotationSeen\n    for i=0,3 do seen[i]=nil end\n    for id in pairs(s.rotationActors) do\n        local ent=TensorCore.mGetEntity(id)\n        local buff=ent and TensorCore.getBuff(ent,2056)\n        if not ent or not buff then return false end\n        local offset=buff.stacks-952\n        if offset<0 or offset>3 or offset%1~=0 or seen[offset] then return false end\n        seen[offset]=true\n        count=count+1\n        if ent.pos.y<5 then\n            if bottom~=nil then return false end\n            bottom=offset\n        end\n    end\n    if count~=4 or bottom==nil then return false end\n    return M.rotation(bottom)\nend\n\nfunction M.updateRotation()\n    if not s.active or s.expected~=4 or s.rotated or s.count~=0 or not s.rotationUntil then return end\n    local remain=s.rotationUntil-Now()\n    if remain<=0 then s.rotationUntil=nil;return end\n    if M.tryRotation() then drawShape(s.activeOrder[1],remain) end\nend\n\nfunction M.onMarker(e)\n    local shape = shapes[e.markerID]\n    if shape == nil or not s.collecting or e.entityID ~= s.bossID then return end\n    if #s.order >= s.expected then return end\n    s.order[#s.order + 1] = shape\nend\n\nfunction M.onChannel(e)\n    local id = e.spellID\n    if id == 44556 or id == 44564 then\n        M.clear()\n        s.bossID, s.expected, s.collecting = e.entityID, (id == 44564 and 4 or 1), true\n        return\n    end\n\n    local groups = releaseGroups[id]\n    if groups ~= nil then\n        if s.bossID ~= e.entityID then return end\n        s.collecting, s.active, s.groups, s.count = false, true, groups, 0\n        s.lastHitAt, s.lastHitShape, s.lastChannelAt, s.lastChannelShape = nil, nil, nil, nil\n        local duration = math.max(0, e.channelTimeMax) * 1000\n        if id == 44557 or id == 44558 then\n            s.expected = 1\n            if #s.order == 1 then\n                s.activeOrder = {s.order[1]}\n                drawShape(s.order[1], duration + 1350)\n            end\n            drawStacks(duration + 1450)\n        else\n            s.expected = 4\n            s.rotationUntil=Now()+duration+1350\n            M.tryRotation()\n            -- If the public status path is unavailable, the first observed\n            -- helper remains the fail-closed fallback, never a guessed rotation.\n            if s.rotated and s.activeOrder ~= nil then\n                drawShape(s.activeOrder[1], duration + 1350)\n            end\n        end\n        return\n    end\n\n    local shape = hits[id]\n    if shape == nil or not s.active then return end\n    local now = Now()\n    -- Two side-lane helpers are one shape. Repeated handler delivery is also\n    -- ignored; successive legitimate shapes are ~2.9s apart.\n    if s.lastChannelShape == shape and s.lastChannelAt and now - s.lastChannelAt < 800 then return end\n    s.lastChannelAt, s.lastChannelShape = now, shape\n\n    if s.expected == 4 and s.count == 0 and not s.rotated then\n        local match, matches = nil, 0\n        for i = 1, #s.order do\n            if s.order[i] == shape then match, matches = i, matches + 1 end\n        end\n        if #s.order == 4 and matches == 1 then M.rotation(match - 1) end\n    end\n    -- A mismatch invalidates future predictions; observed geometry still works.\n    if s.activeOrder and s.activeOrder[s.count + 1] ~= shape then\n        s.activeOrder, s.rotated = nil, false\n    end\n    drawShape(shape, math.max(0, e.channelTimeMax) * 1000 + 150)\n    if s.count + 1 == s.expected then drawStacks(math.max(0, e.channelTimeMax) * 1000 + 250) end\nend\n\nfunction M.onCast(e)\n    if e.spellID == 44559 or e.spellID == 44560 then\n        removeDraws(s.shapeDraws)\n        removeDraws(s.stackDraws)\n        if M.clearGuide then M.clearGuide() end\n        s.active, s.rotationUntil = false, nil\n        s.shape, s.step, s.sequenceText, s.noticeKey = nil, nil, nil, nil\n        return\n    end\n    local shape = hits[e.spellID]\n    if shape == nil or not s.active then return end\n    local now = Now()\n    if s.lastHitShape == shape and s.lastHitAt and now - s.lastHitAt < 800 then return end\n    s.lastHitAt, s.lastHitShape = now, shape\n    removeDraws(s.shapeDraws)\n    if s.count+1<s.expected then\n        removeDraws(s.stackDraws)\n        if M.clearGuide then M.clearGuide() end\n    end\n    s.count = s.count + 1\n    if s.count < s.expected and s.activeOrder ~= nil then\n        local nextShape = s.activeOrder[s.count + 1]\n        if nextShape ~= nil then\n            -- Expected interval only bounds a preview; the next channel resets\n            -- it to the real observed cast deadline.\n            drawShape(nextShape, 3000)\n            if s.count + 1 == s.expected then drawStacks(3100) end\n        end\n    end\nend\n\n-- Hector role points use the CURRENT shape's safe region. Boss is at (100,78)\n-- in the clear; requiring both IN and MID at once prevented four-pair points.\n-- Half-yalm lane/arena margins and one-yalm circle/donut margins stay inside\n-- the sourced arena and AoE boundaries. Pair cone axes retain 22deg spacing.\nfunction M.rolePoints(bossPos, shape, groups)\n    local inside = shape == \"in\" or shape == \"middle\"\n    if not labels[shape] then return nil end\n    if groups ~= 2 and groups ~= 4 then return nil end\n    local bx,bz = bossPos.x,bossPos.z\n    local function ray(angle, side, far)\n        local radians=math.rad(angle*side)\n        local dx,dz=math.sin(radians),math.cos(radians)\n        local xMin,xMax\n        if shape==\"middle\" then xMin,xMax=94.5,105.5\n        elseif shape==\"sides\" and side<0 then xMin,xMax=82.5,93.5\n        elseif shape==\"sides\" then xMin,xMax=106.5,117.5\n        else xMin,xMax=82.5,117.5 end\n        local lo,hi=0,math.huge\n        local function slab(origin,direction,low,high)\n            if math.abs(direction)<0.000001 then return origin>=low and origin<=high end\n            local a,b=(low-origin)/direction,(high-origin)/direction\n            if a>b then a,b=b,a end\n            lo,hi=math.max(lo,a),math.min(hi,b)\n            return lo<=hi\n        end\n        if not slab(bx,dx,xMin,xMax) or not slab(bz,dz,85.5,114.5) then return nil end\n        if shape==\"in\" then hi=math.min(hi,15)\n        elseif shape==\"out\" then lo=math.max(lo,21) end\n        if lo>hi or hi<=0 then return nil end\n        local r=far and hi or lo\n        return {x=bx+r*dx,z=bz+r*dz,radius=r,angle=angle*side}\n    end\n    local best,bestScore\n    if groups==2 then\n        for a=12,70 do\n            local left,right=ray(a,-1,false),ray(a,1,false)\n            if left and right then\n                local score=math.abs(a-(inside and 25 or 40))+(left.radius+right.radius)*0.2\n                if not bestScore or score<bestScore then\n                    bestScore=score\n                    best={T1=left,H1=left,M1=left,R1=left,T2=right,H2=right,M2=right,R2=right}\n                end\n            end\n        end\n    else\n        for h=11,40 do\n            local lh,rh=ray(h,-1,true),ray(h,1,true)\n            if lh and rh then\n                for t=h+22,80 do\n                    local lt,rt=ray(t,-1,false),ray(t,1,false)\n                    if lt and rt and lt.z+1<=lh.z and rt.z+1<=rh.z then\n                        local score=math.abs(h-15)+math.abs(t-(inside and 35 or 50))*0.25\n                            +(lt.radius+rt.radius)*0.8\n                        if not bestScore or score<bestScore then\n                            bestScore=score\n                            best={T1=lt,M1=lt,T2=rt,M2=rt,H1=lh,R1=lh,H2=rh,R2=rh}\n                        end\n                    end\n                end\n            end\n        end\n    end\n    -- If the actual boss position makes these conservative regions infeasible,\n    -- do not invent a destination. Enemy AoE draws still remain available.\n    return best\nend\n\nfunction M.rolePoint(bossPos, shape, groups, slot)\n    local all=M.rolePoints(bossPos,shape,groups)\n    return all and all[slot] or nil\nend\n\n-- Root wrapper calls M.clear() on OnWipe/countdown cancellation as appropriate.\n-- Early rotation uses the public status path above; missing status evidence\n-- leaves the first observed helper as the conservative fallback.\nself.used = true\n\nlocal N=data.kaptinNecron\nN.reaping=data.kaptinNecronReaping\nN.reaping.clearGuide=function() N.clearArrow(\"reaping\") end\nN.reaping.guide=function(shape,groups,ms,finalShape)\n    local slot=N.slot()\n    local boss=N.reaping.state.bossID and TensorCore.mGetEntity(N.reaping.state.bossID)\n    if not slot or not boss then N.clearArrow(\"reaping\");return end\n    local p=N.reaping.rolePoint(boss.pos,shape,finalShape and (groups or 2) or 2,slot)\n    if p then N.arrow(p.x,p.z,ms,\"reaping\") else N.clearArrow(\"reaping\") end\nend\nself.used=true",
 							name = "[Setup] Reaping shape and pair solver",
 							uuid = "db7725d4-6509-deb8-9271-9ea41925b43a",
 							version = 2.1,
@@ -972,17 +914,6 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "e516e0fd-f005-40e1-4881-0de362f7414d",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-		
-		{
-			data = 
-			{
-				displayPath = "",
 				name = "Hector draws",
 				uuid = "c51a33f8-e124-e959-a8fe-4ecde72a827b",
 			},
@@ -1119,17 +1050,6 @@ local tbl =
 	},
 	[16] = 
 	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "3958ade2-e63d-16ee-5ae4-4840f0b10d72",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
 		
 		{
 			data = 
@@ -1393,20 +1313,6 @@ local tbl =
 			},
 		},
 	},
-	[19] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "b8253bf7-a2a5-648b-d2a4-7c89e50b3dc7",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
 	[20] = 
 	{
 		
@@ -1597,33 +1503,8 @@ local tbl =
 			},
 		},
 	},
-	[23] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "0a0c4956-0bb8-046a-bc85-41a8efec7da6",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
 	[24] = 
 	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "b397d38b-231a-0117-bdb6-ed299ec4c85b",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
 		
 		{
 			data = 
@@ -1763,34 +1644,6 @@ local tbl =
 			},
 		},
 	},
-	[25] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "4f0659fc-a870-3fb8-e5ca-be5ae7374d4c",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
-	[26] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "57854a69-7efe-fd65-0fc2-6a4b6b043eb9",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
 	[27] = 
 	{
 		
@@ -1814,7 +1667,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "local base=data.kaptinNecron\nif not base then return end\nif base.gc then self.used=true return end\nlocal N=data.kaptinNecron\nN.gc=(function()\n-- Pure factory: root stores makeGrandCross(N) in its pull-scoped module table.\n-- Native GUI event-ID gates must precede onChannel/onCast/onMarker calls.\n-- Source: necron_hector.md + necron_events.md. No callbacks or polling.\n-- Contract: N.arrow(x,z,durationMs,key), N.clearArrow(key),\n-- N.circle(x,z,radius,durationMs,safe). All destinations stay within radius9.\nlocal function makeGrandCross(N)\n    local M = {}\n    local key = \"grandcross\"\n    local q = math.sqrt(0.5)\n    local directions = {\n        {x=0,z=-1,color=1,kind=\"card\"},\n        {x=q,z=-q,color=2,kind=\"inter\"},\n        {x=1,z=0,color=2,kind=\"card\"},\n        {x=q,z=q,color=3,kind=\"inter\"},\n        {x=0,z=1,color=3,kind=\"card\"},\n        {x=-q,z=q,color=4,kind=\"inter\"},\n        {x=-1,z=0,color=4,kind=\"card\"},\n        {x=-q,z=-q,color=1,kind=\"inter\"},\n    }\n    local colors = {\n        {slots={\"T1\",\"M1\"},card=directions[1],inter=directions[8]},\n        {slots={\"T2\",\"M2\"},card=directions[3],inter=directions[2]},\n        {slots={\"H2\",\"R2\"},card=directions[5],inter=directions[4]},\n        {slots={\"H1\",\"R1\"},card=directions[7],inter=directions[6]},\n    }\n    local colorOf = {T1=1,M1=1,T2=2,M2=2,H2=3,R2=3,H1=4,R1=4}\n    local s = {}\n\n    local function clearArrow()\n        N.clearArrow(key)\n    end\n\n    local function arrow(x,z,duration)\n        local dx,dz=x-100,z-100\n        if dx*dx+dz*dz > 81.0001 then clearArrow() return end\n        N.arrow(x,z,duration,key)\n    end\n\n    local function myColor()\n        local roster = AnyoneCore and AnyoneCore.Roster\n        if roster == nil or roster.current() == nil then return nil end\n        local slot = roster.mySlot()\n        return colorOf[slot],roster\n    end\n\n    local function clock(kind,radius,duration)\n        local color = myColor()\n        if color == nil then clearArrow() return end\n        local d = colors[color][kind]\n        arrow(100+d.x*radius,100+d.z*radius,duration)\n    end\n\n    local function resetWave()\n        s.markers,s.towers,s.channels,s.resolved = {},{},{},{}\n        s.markerCount,s.resolveCount = 0,0\n    end\n\n    function M.clear()\n        clearArrow()\n        s.active=false\n        s.wave,s.lasers,s.puddles=0,0,0\n        s.lastLaser,s.lastPuddle,s.started=nil,nil,nil\n        resetWave()\n    end\n\n    local function begin()\n        M.clear()\n        s.active,s.wave,s.started=true,1,Now()\n        -- Grand Cross raidwide and arena shrink: everyone in center first.\n        arrow(100,100,15000)\n    end\n\n    local function active()\n        if not s.active then return false end\n        if Now()-s.started > 65000 then M.clear() return false end\n        return true\n    end\n\n    local function position(e)\n        -- OnEntityCast ground coordinates are optional. Tower helpers stand\n        -- at the tower location; channel events only supply their entity ID.\n        if type(e.castPosX)==\"number\" and type(e.castPosZ)==\"number\" then\n            return e.castPosX,e.castPosZ\n        end\n        local ent=TensorCore.mGetEntity(e.entityID)\n        if ent == nil then return nil end\n        return ent.pos.x,ent.pos.z\n    end\n\n    local function towerPoint(x,z)\n        if x==nil or z==nil then return nil end\n        local dx,dz=x-100,z-100\n        local radius=math.sqrt(dx*dx+dz*dz)\n        if radius<1 or radius>9.001 then return nil end\n        local best,bestDot\n        for i=1,#directions do\n            local d=directions[i]\n            local dot=(dx*d.x+dz*d.z)/radius\n            if bestDot==nil or dot>bestDot then best,bestDot=d,dot end\n        end\n        -- Fail closed on a position far from a cardinal/intercardinal.\n        if bestDot<0.98 then return nil end\n        return {x=x,z=z,radius=radius,color=best.color,kind=best.kind}\n    end\n\n    local function coordinateKey(x,z)\n        return string.format(\"%.2f:%.2f\",x,z)\n    end\n\n    local function assignment()\n        if s.wave~=1 and s.wave~=2 then return end\n        local needed=s.wave==1 and 2 or 5\n        if s.lasers<needed then return end\n        local color,roster=myColor()\n        if color==nil or s.markerCount~=4 then clearArrow() return end\n        local c=colors[color]\n        local a,b=roster.idOf(c.slots[1]),roster.idOf(c.slots[2])\n        local player=TensorCore.mGetPlayer()\n        if a==nil or b==nil or player==nil then clearArrow() return end\n        -- Exactly one member of each color pair must have the spread.\n        if (s.markers[a]==true)==(s.markers[b]==true) then clearArrow() return end\n        local t=s.towers[color]\n        if type(t)~=\"table\" then clearArrow() return end\n        local duration=t.expiresAt-Now()\n        if duration<=0 then clearArrow() return end\n        local radius=math.min(t.radius,8.5)\n        if s.markers[player.id] then\n            local d=c[t.kind==\"card\" and \"inter\" or \"card\"]\n            arrow(100+d.x*radius,100+d.z*radius,duration)\n        elseif player.id==a or player.id==b then\n            -- Stand slightly in from an edge tower center while still inside\n            -- its3y circle; never point outside the shrunken arena.\n            local d=c[t.kind]\n            arrow(100+d.x*radius,100+d.z*radius,duration)\n            if not t.highlighted then\n                N.circle(t.x,t.z,3,duration,true)\n                t.highlighted=true\n            end\n        else\n            clearArrow()\n        end\n    end\n\n    function M.onChannel(e)\n        local id=e.spellID\n        if id==44568 then begin() return end\n        if not active() then return end\n        if id==44604 then\n            arrow(100,100,15000)\n        elseif id==44571 then\n            local now=Now()\n            -- Each puddle set has multiple helpers but the next set is2s later.\n            if s.lastPuddle and now-s.lastPuddle<1000 then return end\n            s.lastPuddle=now\n            s.puddles=s.puddles+1\n            if s.wave==1 and s.puddles<=2 then\n                -- Ground AOEs snapshot at cast start. Fan out in two steps.\n                clock(\"inter\",s.puddles==1 and 4 or 8,8000)\n            elseif s.wave==3 and s.puddles>=3 and s.puddles<=4 then\n                clock(\"inter\",s.puddles==3 and 4 or 8,8000)\n            else\n                clearArrow()\n            end\n        elseif id==44573 and (s.wave==1 or s.wave==2) then\n            if type(e.channelTimeMax)~=\"number\" or e.channelTimeMax<=0 then return end\n            local x,z=position(e)\n            local t=towerPoint(x,z)\n            if t==nil then return end\n            t.expiresAt=Now()+e.channelTimeMax*1000\n            local k=coordinateKey(x,z)\n            if s.channels[k] then return end\n            s.channels[k]=true\n            local old=s.towers[t.color]\n            if old==nil then\n                s.towers[t.color]=t\n            elseif type(old)~=\"table\" or math.abs(old.x-x)+math.abs(old.z-z)>0.1 then\n                s.towers[t.color]=false\n            end\n            assignment()\n        end\n    end\n\n    function M.onMarker(e)\n        if not active() or (s.wave~=1 and s.wave~=2) then return end\n        if e.markerID==611 and not s.markers[e.entityID] then\n            s.markers[e.entityID]=true\n            s.markerCount=s.markerCount+1\n            assignment()\n        end\n    end\n\n    function M.onCast(e)\n        local id=e.spellID\n        if id==44568 then\n            if not s.active then begin() end\n            return\n        end\n        if not active() then return end\n        if id==44569 then\n            local now=Now()\n            if s.lastLaser and now-s.lastLaser<1000 then return end\n            s.lastLaser=now\n            s.lasers=s.lasers+1\n            if s.lasers==2 or s.lasers==5 then assignment() end\n            if s.lasers>5 then clearArrow() end\n        elseif id==44573 and (s.wave==1 or s.wave==2) then\n            local x,z=position(e)\n            if x==nil then return end\n            local k=coordinateKey(x,z)\n            if not s.channels[k] or s.resolved[k] then return end\n            s.resolved[k]=true\n            s.resolveCount=s.resolveCount+1\n            if s.resolveCount==4 then\n                s.wave=s.wave+1\n                resetWave()\n                if s.wave==2 then\n                    -- After first towers the safe waiting clock is CARDINAL.\n                    clock(\"card\",8,12000)\n                else\n                    -- Rejoin center for the final two bait sets, then fan out.\n                    arrow(100,100,10000)\n                end\n            end\n        elseif id==44570 then\n            -- Proximity has resolved. No new destination until Neutron Ring.\n            clearArrow()\n        elseif id==44574 or id==44576 then\n            M.clear()\n        end\n    end\n\n    return M\nend\n\nreturn makeGrandCross\n\nend)()(N)\nself.used=true",
+							actionLua = "local base=data.kaptinNecron\nif not base then return end\nif base.gc then self.used=true return end\nlocal N=data.kaptinNecron\nN.gc=(function()\n-- Pure factory: root stores makeGrandCross(N) in its pull-scoped module table.\n-- Native GUI event-ID gates must precede onChannel/onCast/onMarker calls.\n-- Source: necron_hector.md + necron_events.md. No callbacks or polling.\n-- Contract: N.arrow(x,z,durationMs,key), N.clearArrow(key),\n-- N.circle(x,z,radius,durationMs,safe). All destinations stay within radius9.\nlocal function makeGrandCross(N)\n    local M = {}\n    local key = \"grandcross\"\n    local q = math.sqrt(0.5)\n    local directions = {\n        {x=0,z=-1,color=1,kind=\"card\"},\n        {x=q,z=-q,color=2,kind=\"inter\"},\n        {x=1,z=0,color=2,kind=\"card\"},\n        {x=q,z=q,color=3,kind=\"inter\"},\n        {x=0,z=1,color=3,kind=\"card\"},\n        {x=-q,z=q,color=4,kind=\"inter\"},\n        {x=-1,z=0,color=4,kind=\"card\"},\n        {x=-q,z=-q,color=1,kind=\"inter\"},\n    }\n    local colors = {\n        {slots={\"T1\",\"M1\"},card=directions[1],inter=directions[8]},\n        {slots={\"T2\",\"M2\"},card=directions[3],inter=directions[2]},\n        {slots={\"H2\",\"R2\"},card=directions[5],inter=directions[4]},\n        {slots={\"H1\",\"R1\"},card=directions[7],inter=directions[6]},\n    }\n    local colorOf = {T1=1,M1=1,T2=2,M2=2,H2=3,R2=3,H1=4,R1=4}\n    local s = {}\n    local previews = {}\n    local beams = {}\n    local red = TensorCore.getCachedDrawer(0x600000FF,0x600000FF,0x600000FF,0xFF0000FF,2,6)\n    local center = {x=100,y=0,z=100}\n    local forecasts = {}\n\n    local function removeShape(uuid)\n        if uuid then Argus.deleteTimedShape(uuid);N.shapes[uuid]=nil end\n    end\n    local function clearPreviews()\n        for uuid in pairs(previews) do removeShape(uuid) end\n        previews={}\n    end\n    local function removeForecast(source)\n        local f=forecasts[source]\n        if f then removeShape(f.uuid);forecasts[source]=nil end\n    end\n    local function beam(heading,ms,width)\n        center.y=TensorCore.mGetPlayer().pos.y\n        local x,y,z=TensorCore.getPosInDirection(center,heading+math.pi,20,true)\n        local uuid=N.remember(red:addTimedRect(ms,x,y,z,40,width,heading,0,false,true),ms)\n        if uuid then beams[uuid]=true end\n        return uuid\n    end\n\n    local function clearArrow()\n        N.clearArrow(key)\n    end\n\n    local function arrow(x,z,duration)\n        local dx,dz=x-100,z-100\n        if dx*dx+dz*dz > 81.0001 then clearArrow() return end\n        N.arrow(x,z,duration,key)\n    end\n\n    local function myColor()\n        local roster = AnyoneCore and AnyoneCore.Roster\n        if roster == nil or roster.current() == nil then return nil end\n        local slot = roster.mySlot()\n        return colorOf[slot],roster\n    end\n\n    local function clock(kind,radius,duration)\n        local color = myColor()\n        if color == nil then clearArrow() return end\n        local d = colors[color][kind]\n        arrow(100+d.x*radius,100+d.z*radius,duration)\n    end\n\n    local function resetWave()\n        s.markers,s.towers,s.channels,s.resolved = {},{},{},{}\n        s.markerCount,s.resolveCount = 0,0\n        s.previewSignature=nil\n        clearPreviews()\n    end\n\n    function M.clear()\n        clearArrow()\n        for uuid in pairs(beams) do removeShape(uuid) end\n        beams={};forecasts={}\n        s.active=false\n        s.wave,s.lasers,s.puddles=0,0,0\n        s.lastLaser,s.lastPuddle,s.started=nil,nil,nil\n        s.forecastLabelShown=false\n        resetWave()\n    end\n\n    local function begin()\n        M.clear()\n        s.active,s.wave,s.started=true,1,Now()\n        -- Grand Cross raidwide and arena shrink: everyone in center first.\n        arrow(100,100,15000)\n    end\n\n    local function active()\n        if not s.active then return false end\n        if Now()-s.started > 65000 then M.clear() return false end\n        return true\n    end\n\n    local function position(e)\n        -- OnEntityCast ground coordinates are optional. Tower helpers stand\n        -- at the tower location; channel events only supply their entity ID.\n        if type(e.castPosX)==\"number\" and type(e.castPosZ)==\"number\" then\n            return e.castPosX,e.castPosZ\n        end\n        local ent=TensorCore.mGetEntity(e.entityID)\n        if ent == nil then return nil end\n        return ent.pos.x,ent.pos.z\n    end\n\n    local function towerPoint(x,z)\n        if x==nil or z==nil then return nil end\n        local dx,dz=x-100,z-100\n        local radius=math.sqrt(dx*dx+dz*dz)\n        if radius<1 or radius>9.001 then return nil end\n        local best,bestDot\n        for i=1,#directions do\n            local d=directions[i]\n            local dot=(dx*d.x+dz*d.z)/radius\n            if bestDot==nil or dot>bestDot then best,bestDot=d,dot end\n        end\n        -- Fail closed on a position far from a cardinal/intercardinal.\n        if bestDot<0.98 then return nil end\n        return {x=x,z=z,radius=radius,color=best.color,kind=best.kind}\n    end\n\n    local function coordinateKey(x,z)\n        return string.format(\"%.2f:%.2f\",x,z)\n    end\n\n    local function assignment()\n        if s.wave~=1 and s.wave~=2 then return end\n        local needed=s.wave==1 and 2 or 5\n        local color,roster=myColor()\n        if color==nil then clearArrow() return end\n        if s.markerCount~=4 then return end\n        local c=colors[color]\n        local a,b=roster.idOf(c.slots[1]),roster.idOf(c.slots[2])\n        local player=TensorCore.mGetPlayer()\n        if a==nil or b==nil or player==nil then clearArrow() return end\n        -- Exactly one member of each color pair must have the spread.\n        if (s.markers[a]==true)==(s.markers[b]==true) then clearArrow() return end\n        local t=s.towers[color]\n        if type(t)~=\"table\" then return end\n        local duration=t.expiresAt-Now()\n        if duration<=0 then clearArrow() return end\n        local marked=s.markers[player.id]==true\n        local kind=marked and (t.kind==\"card\" and \"inter\" or \"card\") or t.kind\n        local previewRadius=math.min(t.radius,8.5)\n        local previewDirection=c[kind]\n        local signature=tostring(s.wave)..\":\"..tostring(marked)..\":\"..kind\n        if s.previewSignature~=signature then\n            clearPreviews()\n            local uuid=N.circle(100+previewDirection.x*previewRadius,100+previewDirection.z*previewRadius,marked and 0.6 or 3,duration,true)\n            if uuid then previews[uuid]=true end\n            s.previewSignature=signature\n        end\n        -- Show the future assignment immediately, but retain the safe waiting\n        -- arrow until the second/fifth laser has actually resolved.\n        if s.lasers<needed then return end\n        local radius=math.min(t.radius,8.5)\n        if marked then\n            local d=c[t.kind==\"card\" and \"inter\" or \"card\"]\n            arrow(100+d.x*radius,100+d.z*radius,duration)\n        elseif player.id==a or player.id==b then\n            -- Stand slightly in from an edge tower center while still inside\n            -- its3y circle; never point outside the shrunken arena.\n            local d=c[t.kind]\n            arrow(100+d.x*radius,100+d.z*radius,duration)\n        else\n            clearArrow()\n        end\n    end\n\n    function M.onChannel(e)\n        local id=e.spellID\n        if id==44568 then begin() return end\n        if not active() then return end\n        if id==44604 then\n            arrow(100,100,15000)\n        elseif id==44571 then\n            local now=Now()\n            -- Each puddle set has multiple helpers but the next set is2s later.\n            if s.lastPuddle and now-s.lastPuddle<1000 then return end\n            s.lastPuddle=now\n            s.puddles=s.puddles+1\n            if s.wave==1 and s.puddles<=2 then\n                -- Ground AOEs snapshot at cast start. Fan out in two steps.\n                clock(\"inter\",s.puddles==1 and 4 or 8,8000)\n            elseif s.wave==3 and s.puddles>=3 and s.puddles<=4 then\n                clock(\"inter\",s.puddles==3 and 4 or 8,8000)\n            else\n                clearArrow()\n            end\n        elseif id==44573 and (s.wave==1 or s.wave==2) then\n            if type(e.channelTimeMax)~=\"number\" or e.channelTimeMax<=0 then return end\n            local x,z=position(e)\n            local t=towerPoint(x,z)\n            if t==nil then return end\n            t.expiresAt=Now()+e.channelTimeMax*1000\n            local k=coordinateKey(x,z)\n            if s.channels[k] then return end\n            s.channels[k]=true\n            local old=s.towers[t.color]\n            if old==nil then\n                s.towers[t.color]=t\n            elseif type(old)~=\"table\" or math.abs(old.x-x)+math.abs(old.z-z)>0.1 then\n                s.towers[t.color]=false\n            end\n            assignment()\n        end\n    end\n\n    -- Native OnTetherChange GUI gate admits only 343/344.\n    -- Public BossMod predicts +42/+207 degrees; logs corroborate the\n    -- convention but show up to4.51-degree early uncertainty. The actual\n    -- laser channel replaces the forecast with its locked direction.\n    -- The9y-wide preview includes a2.5y lateral uncertainty margin per\n    -- edge within the9y arena. It is intentionally not the4y hitbox.\n    function M.onTether(e)\n        if not active() then return end\n        local ent=TensorCore.mGetEntity(e.sourceEntityID)\n        if not ent then return end\n        local offset=e.newTetherID==344 and 207 or 42\n        local ms=e.newTetherID==344 and 5000 or 7000\n        if not s.forecastLabelShown then\n            TensorCore.addAlertText(2500,\"RED = beam PREVIEW (wide margin)\",1,3,false)\n            s.forecastLabelShown=true\n        end\n        center.y=ent.pos.y\n        local heading=TensorCore.getHeadingToTarget(ent.pos,center)+math.rad(offset)\n        removeForecast(e.sourceEntityID)\n        forecasts[e.sourceEntityID]={uuid=beam(heading,ms+700,9),at=Now()+ms}\n    end\n\n    -- Native OnEntityChannel GUI gate admits only laser44569.\n    function M.onBeamChannel(e)\n        if not active() then return end\n        local source,best\n        for id,f in pairs(forecasts) do\n            local distance=math.abs(f.at-Now())\n            if best==nil or distance<best then source,best=id,distance end\n        end\n        if source and best<=1500 then removeForecast(source) end\n        local ent=TensorCore.mGetEntity(e.entityID)\n        if ent then beam(ent.pos.h,math.max(500,(e.channelTimeMax or 0)*1000+400),4) end\n    end\n\n    function M.onMarker(e)\n        if not active() or (s.wave~=1 and s.wave~=2) then return end\n        if e.markerID==611 and not s.markers[e.entityID] then\n            s.markers[e.entityID]=true\n            s.markerCount=s.markerCount+1\n            assignment()\n        end\n    end\n\n    function M.onCast(e)\n        local id=e.spellID\n        if id==44568 then\n            if not s.active then begin() end\n            return\n        end\n        if not active() then return end\n        if id==44569 then\n            local now=Now()\n            if s.lastLaser and now-s.lastLaser<1000 then return end\n            s.lastLaser=now\n            s.lasers=s.lasers+1\n            if s.lasers==2 or s.lasers==5 then assignment() end\n            if s.lasers>5 then clearArrow() end\n        elseif id==44573 and (s.wave==1 or s.wave==2) then\n            local x,z=position(e)\n            if x==nil then return end\n            local k=coordinateKey(x,z)\n            if not s.channels[k] or s.resolved[k] then return end\n            s.resolved[k]=true\n            s.resolveCount=s.resolveCount+1\n            if s.resolveCount==4 then\n                s.wave=s.wave+1\n                resetWave()\n                if s.wave==2 then\n                    -- After first towers the safe waiting clock is CARDINAL.\n                    clock(\"card\",8,12000)\n                else\n                    -- Rejoin center for the final two bait sets, then fan out.\n                    arrow(100,100,10000)\n                end\n            end\n        elseif id==44570 then\n            -- Proximity has resolved. No new destination until Neutron Ring.\n            clearArrow()\n        elseif id==44574 or id==44576 then\n            M.clear()\n        end\n    end\n\n    return M\nend\n\nreturn makeGrandCross\n\nend)()(N)\nself.used=true",
 							name = "[Setup] Grand Cross tower assignments",
 							uuid = "21814b6a-56e0-e836-87c6-57b8b5686a86",
 							version = 2.1,
@@ -1963,6 +1816,135 @@ local tbl =
 				timerEndOffset = 50.8,
 				timerStartOffset = -10.2,
 				uuid = "4e498819-41bd-5d85-b013-0097e58138da",
+				version = 2,
+			},
+		},
+		
+		{
+			data = 
+			{
+				actions = 
+				{
+					
+					{
+						data = 
+						{
+							aType = "Lua",
+							actionLua = "local N=data.kaptinNecron\nif not N or not N.gc then return end\nN.gc.onTether(eventArgs)\nself.used=true",
+							conditions = 
+							{
+								
+								{
+									"5485ee96-f701-c6a4-aead-9a29b59cc7bd",
+									true,
+								},
+								
+								{
+									"3d3cbc44-6373-6ae3-b655-3a646d40590b",
+									true,
+								},
+							},
+							name = "[Draw] GC 1 red beam forecast",
+							uuid = "8fc8f720-ad21-ff80-8485-ec4634629893",
+							version = 2.1,
+						},
+					},
+				},
+				conditions = 
+				{
+					
+					{
+						data = 
+						{
+							category = "Event",
+							dequeueIfLuaFalse = true,
+							eventArgType = 5,
+							eventIntValue = 343,
+							name = "Tether minimum",
+							uuid = "5485ee96-f701-c6a4-aead-9a29b59cc7bd",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Event",
+							comparator = 2,
+							dequeueIfLuaFalse = true,
+							eventArgType = 5,
+							eventIntValue = 344,
+							name = "Tether maximum",
+							uuid = "3d3cbc44-6373-6ae3-b655-3a646d40590b",
+							version = 3,
+						},
+					},
+				},
+				displayPath = "Hector draws",
+				eventType = 15,
+				loop = true,
+				mechanicTime = 140.2,
+				name = "[Draw] GC 1 red beam forecast",
+				timeRange = true,
+				timelineIndex = 27,
+				timerEndOffset = 55,
+				timerStartOffset = -10,
+				uuid = "89064b01-4905-3a43-823c-73ccf2af398e",
+				version = 2,
+			},
+		},
+		
+		{
+			data = 
+			{
+				actions = 
+				{
+					
+					{
+						data = 
+						{
+							aType = "Lua",
+							actionLua = "local N=data.kaptinNecron\nif not N or not N.gc then return end\nN.gc.onBeamChannel(eventArgs)\nself.used=true",
+							conditions = 
+							{
+								
+								{
+									"49617098-ba6d-85c2-907d-e050a455f848",
+									true,
+								},
+							},
+							name = "[Draw] GC 1 locked red beam",
+							uuid = "ac803b3a-d106-353f-b3b6-fe686be7f2cf",
+							version = 2.1,
+						},
+					},
+				},
+				conditions = 
+				{
+					
+					{
+						data = 
+						{
+							category = "Event",
+							dequeueIfLuaFalse = true,
+							eventArgType = 2,
+							eventSpellID = 44569,
+							name = "Laser cast",
+							uuid = "49617098-ba6d-85c2-907d-e050a455f848",
+							version = 3,
+						},
+					},
+				},
+				displayPath = "Hector draws",
+				eventType = 3,
+				loop = true,
+				mechanicTime = 140.2,
+				name = "[Draw] GC 1 locked red beam",
+				timeRange = true,
+				timelineIndex = 27,
+				timerEndOffset = 55,
+				timerStartOffset = -10,
+				uuid = "2c28dd5d-7bcb-19d6-b234-f32a2f9dbcb9",
 				version = 2,
 			},
 		},
@@ -2299,34 +2281,6 @@ local tbl =
 				uuid = "228a5073-6084-2af4-a302-59fc0ec3ef0d",
 				version = 2,
 			},
-		},
-	},
-	[40] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "95f51099-df49-d445-4ced-d7eb98c40369",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
-	[44] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "1af61605-e4ba-6fd9-cbe8-8a67d5498755",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
 		},
 	},
 	[56] = 
@@ -2756,17 +2710,6 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "cde836c3-5d6b-985f-abc3-3085594bfc53",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-		
-		{
-			data = 
-			{
-				displayPath = "",
 				name = "Hector draws",
 				uuid = "05814c21-506b-2b15-ba3f-7aeb69cfb254",
 			},
@@ -2903,17 +2846,6 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "cb004cb4-3a06-d3a0-20e7-6632fed4ff04",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-		
-		{
-			data = 
-			{
-				displayPath = "",
 				name = "Hector draws",
 				uuid = "784e48d1-738a-7208-b4a2-26605a9c35e4",
 			},
@@ -3039,34 +2971,83 @@ local tbl =
 				version = 2,
 			},
 		},
-	},
-	[62] = 
-	{
 		
 		{
 			data = 
 			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "2d8134a1-e36a-138d-5eb5-5143423494b1",
+				actions = 
+				{
+					
+					{
+						data = 
+						{
+							aType = "Lua",
+							actionLua = "local N=data.kaptinNecron\nif not N or not N.reaping then return end\nN.reaping.onTether(eventArgs)\nself.used=true",
+							conditions = 
+							{
+								
+								{
+									"cfc88cf3-9d38-0721-9b22-cab00442229c",
+									true,
+								},
+								
+								{
+									"b232b9b1-50c2-441e-8e0e-3c7b44a845c0",
+									true,
+								},
+							},
+							name = "[Setup] Relentless 1 rotation actors",
+							uuid = "3f03a845-0e1a-05e1-b755-041fd7967139",
+							version = 2.1,
+						},
+					},
+				},
+				conditions = 
+				{
+					
+					{
+						data = 
+						{
+							category = "Event",
+							dequeueIfLuaFalse = true,
+							eventArgType = 5,
+							eventIntValue = 347,
+							name = "Tether minimum",
+							uuid = "cfc88cf3-9d38-0721-9b22-cab00442229c",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Event",
+							comparator = 2,
+							dequeueIfLuaFalse = true,
+							eventArgType = 5,
+							eventIntValue = 350,
+							name = "Tether maximum",
+							uuid = "b232b9b1-50c2-441e-8e0e-3c7b44a845c0",
+							version = 3,
+						},
+					},
+				},
+				displayPath = "Hector draws",
+				eventType = 15,
+				loop = true,
+				mechanicTime = 360.5,
+				name = "[Setup] Relentless 1 rotation actors",
+				timeRange = true,
+				timelineIndex = 61,
+				timerEndOffset = 18,
+				timerStartOffset = -20,
+				uuid = "a86fab2b-e6f1-994b-92a7-3caefb87cf5d",
+				version = 2,
 			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
 		},
 	},
 	[63] = 
 	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "ae2d9b72-e781-cfee-83ad-e8748fdddd82",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
 		
 		{
 			data = 
@@ -3204,76 +3185,6 @@ local tbl =
 				uuid = "72af263d-fdd0-a77a-b2a9-b23a9af1d25a",
 				version = 2,
 			},
-		},
-	},
-	[64] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "c0ca1ddf-bf7f-39c3-82a0-2b0d76cd3eaf",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
-	[65] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "bfd01260-e477-d0f4-86b7-e76e98d1f930",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
-	[66] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "2073cf4d-f149-f9e1-730d-0a9fb92a839d",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
-	[67] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "857860ae-81b1-4eb2-d93c-eb20f8e67ebe",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
-	[68] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "d2a61f4b-0afc-d407-e70d-abe9da11b31b",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
 		},
 	},
 	[69] = 
@@ -3892,7 +3803,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "local base=data.kaptinNecron\nif not base then return end\nif base.mass then self.used=true return end\n-- Focused module for the Necron Hector drawing profile.\n-- Initialized once per pull by its own setup reaction.\nlocal N=data.kaptinNecron\nlocal M={}\nN.mass=M\nlocal position,wasHit=N.position,N.wasHit\n\nlocal portals={\n    four_n={x=100,z=94},four_s={x=100,z=106},\n    two_wn={x=85,z=97},two_en={x=115,z=97},two_ws={x=85,z=103},two_es={x=115,z=103},\n    three_nw={x=91,z=88},three_ne={x=109,z=88},three_sw={x=91,z=112},three_se={x=109,z=112},\n    corner_nw={x=83,z=86},corner_ne={x=117,z=86}\n}\nfunction M.guide()\n    local slot=N.slot(); if not slot then N.clearArrow(\"mass\");return end\n    local p=TensorCore.mGetPlayer()\n    local vuln=TensorCore.getBuff(p.id,2941)\n    if N.mm.awaitVulnUntil then\n        if vuln~=nil then N.mm.vulnObserved=true end\n        -- A temporarily absent packet is not proof that the post-soak debuff\n        -- expired. Observe that debuff before permitting the next portal.\n        if Now()<N.mm.awaitVulnUntil or not N.mm.vulnObserved then return end\n        if vuln==nil then N.mm.awaitVulnUntil=nil end\n    end\n    local key,_,stage=N.strategy.massTarget(slot,N.mm,vuln==nil)\n    if key==N.mm.lastKey and (N.arrows.mass or not portals[key]) then return end\n    N.mm.lastKey=key\n    N.clearArrow(\"mass\")\n    -- While vulnerable, suppress the movement arrow. A movement arrow into\n    -- a tower would tell the player to soak before their real debuff expires.\n    if not key or key:sub(1,5)==\"hold_\" or key:sub(1,6)==\"hands_\" then return end\n    local t=portals[key]\n    if t then\n        local x=t.x\n        if key==\"three_se\" then x=x-1.25 end -- inside/west edge avoids OT cone\n        N.arrow(x,t.z,15000,\"mass\")\n    end\nend\n\nfunction M.onChannel(e)\n    local id=e.spellID\n    local ent=TensorCore.mGetEntity(e.entityID)\n    if id==44595 then\n        N.mm=N.strategy.newMassState();N.mm.started=Now();M.guide()\n    end\nend\nfunction M.onCast(e)\n    local id=e.spellID\n    if id==44567 then\n        -- Smite follows the hand snapshot by about one second. Keep the\n        -- assigned spread position visible through the Smite damage event.\n        if N.mm and N.mm.active then\n            N.defer(\"mass_hands\",250,function()\n                N.strategy.massEvent(N.mm,\"memento_hands_resolved\");N.mm.lastKey=nil;M.guide()\n            end)\n        end\n    elseif id==44819 and N.mm and N.mm.active then\n        local pos=position(e);local player=TensorCore.mGetPlayer()\n        if pos and wasHit(e,player.id) then\n            for key,p in pairs(portals) do\n                if (p.x-pos.x)^2+(p.z-pos.z)^2<1 then\n                    N.strategy.massEvent(N.mm,\"portal_resolved\",key);N.mm.lastKey=nil\n                    -- Allow the vulnerability packet to arrive before considering\n                    -- another portal. Actual buff still gates the following step.\n                    N.mm.awaitVulnUntil=Now()+700\n                    N.mm.vulnObserved=TensorCore.getBuff(player.id,2941)~=nil\n                    N.clearArrow(\"mass\")\n                    break\n                end\n            end\n        end\n    elseif id==44593 and N.mm and N.mm.active then\n        if not N.mm.lastBuster or Now()-N.mm.lastBuster>1000 then\n            N.mm.lastBuster=Now()\n            local event=N.mm.firstBuster and \"second_buster_resolved\" or \"first_buster_resolved\"\n            N.strategy.massEvent(N.mm,event);N.mm.lastKey=nil\n            if N.mm.secondBuster then N.defer(\"mass_end\",20000,function()N.mm.active=false;N.clearArrow(\"mass\")end) end\n        end\n    elseif id==44596 and N.mm then N.mm.active=false;N.clearArrow(\"mass\")\n    end\nend\n\nfunction M.clear() N.mm=nil end\n\nself.used=true",
+							actionLua = "local base=data.kaptinNecron\nif not base then return end\nif base.mass then self.used=true return end\n-- Focused module for the Necron Hector drawing profile.\n-- Initialized once per pull by its own setup reaction.\nlocal N=data.kaptinNecron\nlocal M={}\nN.mass=M\nlocal position,wasHit=N.position,N.wasHit\n\nlocal portals={\n    four_n={x=100,z=94},four_s={x=100,z=106},\n    two_wn={x=85,z=97},two_en={x=115,z=97},two_ws={x=85,z=103},two_es={x=115,z=103},\n    three_nw={x=91,z=88},three_ne={x=109,z=88},three_sw={x=91,z=112},three_se={x=109,z=112},\n    corner_nw={x=83,z=86},corner_ne={x=117,z=86}\n}\nlocal highlighted\nlocal function clearHighlight()\n    if highlighted then Argus.deleteTimedShape(highlighted);N.shapes[highlighted]=nil;highlighted=nil end\nend\nlocal function handDestination(slot)\n    local state=N.mm\n    if not state or state.handsResolved or not state.handRows or state.handCount~=5 then return nil end\n    local route=N.strategy.massRoute(slot)\n    if not route then return nil end\n    local two=portals[route[2]]\n    local side=two.x<100 and \"west\" or \"east\"\n    local rows=state.handRows[side]\n    if state.handGoalSlot==slot then return state.handGoalX,state.handGoalZ end\n    local bestX,bestZ,score\n    local xMin,xMax=side==\"west\" and 85.5 or 107.5,side==\"west\" and 92.5 or 114.5\n    -- Stay outside the12-wide middle line, every3y tower, and all observed\n    -- hand rectangles. Missing edge lanes can contain a3-player tower;\n    -- never use a fixedx that would send a vulnerable player into it.\n    for x=xMin,xMax,0.5 do\n        for z=85.6,114.4,0.2 do\n            local safe=true\n            for _,row in ipairs(rows) do if math.abs(z-row)<3.4 then safe=false;break end end\n            if safe then\n                for portalKey,portal in pairs(portals) do\n                    if portalKey:sub(1,7)~=\"corner_\" and (x-portal.x)^2+(z-portal.z)^2<3.4^2 then\n                        safe=false;break\n                    end\n                end\n            end\n            if safe then\n                local distance=(x-two.x)^2+(z-two.z)^2\n                if not score or distance<score then bestX,bestZ,score=x,z,distance end\n            end\n        end\n    end\n    state.handGoalSlot,state.handGoalX,state.handGoalZ=slot,bestX,bestZ\n    return bestX,bestZ\nend\nfunction M.guide()\n    if not N.mm or not N.mm.active then return end\n    local slot=N.slot(); if not slot then N.clearArrow(\"mass\");clearHighlight();return end\n    local p=TensorCore.mGetPlayer()\n    local vuln=TensorCore.getBuff(p.id,2941)\n    local canSoak=vuln==nil\n    if N.mm.awaitVulnUntil then\n        if vuln~=nil then N.mm.vulnObserved=true end\n        if Now()>=N.mm.awaitVulnUntil and N.mm.vulnObserved and vuln==nil then\n            N.mm.awaitVulnUntil=nil\n        else\n            canSoak=false\n        end\n    end\n    local key,_,stage=N.strategy.massTarget(slot,N.mm,canSoak)\n    local hx,hz=handDestination(slot)\n    if hx then key=\"hands_\"..tostring(hx)..\":\"..string.format(\"%.1f\",hz);stage=\"hands\" end\n    if key==N.mm.lastKey and (N.arrows.mass or (stage and stage:find(\"wait\")) or not portals[key]) then return end\n    N.mm.lastKey=key\n    N.clearArrow(\"mass\");clearHighlight()\n    if hx then N.arrow(hx,hz,6000,\"mass\");return end\n    if not key then return end\n    local waiting=key:sub(1,5)==\"hold_\"\n    local portalKey=waiting and key:sub(6) or key\n    local t=portals[portalKey]\n    if not t then return end\n    if portalKey:sub(1,7)~=\"corner_\" then highlighted=N.circle(t.x,t.z,3,30000,true) end\n    if waiting then\n        -- The next tower remains visible while the real vuln gates entry.\n        -- No movement arrow can suggest soaking while vulnerable.\n        TensorCore.addAlertText(4000,\"WAIT FOR VULN - highlighted tower next\",1,2,false)\n        return\n    end\n    local x=t.x\n    if portalKey==\"three_se\" then x=x-1.25 end\n    N.arrow(x,t.z,15000,\"mass\")\nend\n\nfunction M.onHandChannel(e)\n    if not N.mm or not N.mm.active or N.mm.handsResolved then return end\n    local ent=TensorCore.mGetEntity(e.entityID)\n    if not ent or N.mm.handSeen[e.entityID] then return end\n    local tx,_,tz=TensorCore.getPosInDirection(ent.pos,ent.pos.h,24,true)\n    if math.abs(tx-ent.pos.x)<20 or math.abs(tz-ent.pos.z)>2 then return end\n    local side=tx<ent.pos.x and \"west\" or \"east\"\n    N.mm.handSeen[e.entityID]=true\n    N.mm.handRows[side][#N.mm.handRows[side]+1]=ent.pos.z\n    N.mm.handCount=N.mm.handCount+1\n    if N.mm.handCount==5 then N.mm.lastKey=nil;M.guide() end\nend\n\nfunction M.onChannel(e)\n    local id=e.spellID\n    local ent=TensorCore.mGetEntity(e.entityID)\n    if id==44595 then\n        clearHighlight();N.clearArrow(\"mass\")\n        N.mm=N.strategy.newMassState();N.mm.started=Now()\n        N.mm.handRows={west={},east={}};N.mm.handSeen={};N.mm.handCount=0\n        M.guide()\n    end\nend\nfunction M.onCast(e)\n    local id=e.spellID\n    if id==44567 then\n        -- Smite follows the hand snapshot by about one second. Keep the\n        -- assigned spread position visible through the Smite damage event.\n        if N.mm and N.mm.active then\n            N.defer(\"mass_hands\",250,function()\n                N.strategy.massEvent(N.mm,\"memento_hands_resolved\");N.mm.lastKey=nil;M.guide()\n            end)\n        end\n    elseif id==44819 and N.mm and N.mm.active then\n        local pos=position(e);local player=TensorCore.mGetPlayer()\n        if pos and wasHit(e,player.id) then\n            for key,p in pairs(portals) do\n                if (p.x-pos.x)^2+(p.z-pos.z)^2<1 then\n                    N.strategy.massEvent(N.mm,\"portal_resolved\",key);N.mm.lastKey=nil\n                    -- Allow the vulnerability packet to arrive before considering\n                    -- another portal. Actual buff still gates the following step.\n                    N.mm.awaitVulnUntil=Now()+700\n                    N.mm.vulnObserved=TensorCore.getBuff(player.id,2941)~=nil\n                    N.clearArrow(\"mass\");clearHighlight()\n                    M.guide()\n                    break\n                end\n            end\n        end\n    elseif id==44593 and N.mm and N.mm.active then\n        if not N.mm.lastBuster or Now()-N.mm.lastBuster>1000 then\n            N.mm.lastBuster=Now()\n            local event=N.mm.firstBuster and \"second_buster_resolved\" or \"first_buster_resolved\"\n            N.strategy.massEvent(N.mm,event);N.mm.lastKey=nil\n            if N.mm.secondBuster then N.defer(\"mass_end\",20000,function()N.mm.active=false;N.clearArrow(\"mass\");clearHighlight()end) end\n        end\n    elseif id==44596 and N.mm then N.mm.active=false;N.clearArrow(\"mass\");clearHighlight()\n    end\nend\n\nfunction M.clear() N.mm=nil;N.clearArrow(\"mass\");clearHighlight() end\n\nself.used=true",
 							name = "[Setup] Mass Macabre tower route",
 							uuid = "5938a886-2a1a-4c9d-aa48-dc1dc47c9d28",
 							version = 2.1,
@@ -4066,7 +3977,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "local N=data.kaptinNecron\nif not N or not N.hands then return end\nN.hands.onChannel(eventArgs)\nself.used=true",
+							actionLua = "local N=data.kaptinNecron\nif not N or not N.hands then return end\nN.hands.onChannel(eventArgs)\nif N.mass then N.mass.onHandChannel(eventArgs) end\nself.used=true",
 							conditions = 
 							{
 								
@@ -4246,33 +4157,8 @@ local tbl =
 			},
 		},
 	},
-	[84] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "2ba519a9-8a4b-a335-45a9-a70b3541b9f9",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
 	[85] = 
 	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "53b8eada-b329-c636-e118-2d7c5ca4736a",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
 		
 		{
 			data = 
@@ -4413,17 +4299,6 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "bb7ccd3c-96c4-8848-616b-881aa60b778c",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-		
-		{
-			data = 
-			{
-				displayPath = "",
 				name = "Hector draws",
 				uuid = "382477e4-0f0f-17f5-b45f-024067035e47",
 			},
@@ -4549,34 +4424,83 @@ local tbl =
 				version = 2,
 			},
 		},
-	},
-	[88] = 
-	{
 		
 		{
 			data = 
 			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "cb7e46cd-6cd3-cdc1-7596-7c9f6434fb1d",
+				actions = 
+				{
+					
+					{
+						data = 
+						{
+							aType = "Lua",
+							actionLua = "local N=data.kaptinNecron\nif not N or not N.reaping then return end\nN.reaping.onTether(eventArgs)\nself.used=true",
+							conditions = 
+							{
+								
+								{
+									"4e8a0012-9dc1-dc16-92cf-e92b5ee68718",
+									true,
+								},
+								
+								{
+									"2c280299-f580-df69-bf23-56b0010c31bf",
+									true,
+								},
+							},
+							name = "[Setup] Relentless 2 rotation actors",
+							uuid = "a0d34201-b3f2-ea0f-a691-ece83a1e467a",
+							version = 2.1,
+						},
+					},
+				},
+				conditions = 
+				{
+					
+					{
+						data = 
+						{
+							category = "Event",
+							dequeueIfLuaFalse = true,
+							eventArgType = 5,
+							eventIntValue = 347,
+							name = "Tether minimum",
+							uuid = "4e8a0012-9dc1-dc16-92cf-e92b5ee68718",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Event",
+							comparator = 2,
+							dequeueIfLuaFalse = true,
+							eventArgType = 5,
+							eventIntValue = 350,
+							name = "Tether maximum",
+							uuid = "2c280299-f580-df69-bf23-56b0010c31bf",
+							version = 3,
+						},
+					},
+				},
+				displayPath = "Hector draws",
+				eventType = 15,
+				loop = true,
+				mechanicTime = 499.3,
+				name = "[Setup] Relentless 2 rotation actors",
+				timeRange = true,
+				timelineIndex = 87,
+				timerEndOffset = 18,
+				timerStartOffset = -20,
+				uuid = "8f268984-882f-d9a6-aff6-04d2aaccce2e",
+				version = 2,
 			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
 		},
 	},
 	[89] = 
 	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "3082d82e-33a2-2492-dbc6-5d20a3f0f63e",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
 		
 		{
 			data = 
@@ -4716,76 +4640,6 @@ local tbl =
 			},
 		},
 	},
-	[90] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "b6d93cb8-0f44-282c-e77f-83aae66c3e48",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
-	[91] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "3182fe17-5e57-193b-ba92-a0397c5a28e7",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
-	[92] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "f4ca52e6-249c-b08a-36c5-aecc02d17c36",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
-	[93] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "8d67fa65-878c-1399-ee53-29dbd9f35935",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
-	[94] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "6388058c-e7ab-b7d8-3f7a-df263500215c",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
 	[95] = 
 	{
 		
@@ -4916,20 +4770,6 @@ local tbl =
 				uuid = "acbd1a18-e96d-52cb-86c1-495626dd738d",
 				version = 2,
 			},
-		},
-	},
-	[97] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "f2be47f9-0c8d-1905-31d7-ad574954bd49",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
 		},
 	},
 	[98] = 
@@ -5464,17 +5304,6 @@ local tbl =
 			data = 
 			{
 				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "510bd6c0-96f5-07ac-066c-72065b356f50",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-		
-		{
-			data = 
-			{
-				displayPath = "",
 				name = "Hector draws",
 				uuid = "326501e4-20ec-9782-abae-aee280afd20c",
 			},
@@ -5733,6 +5562,135 @@ local tbl =
 				timerEndOffset = 50.8,
 				timerStartOffset = -10.2,
 				uuid = "a44c7484-48eb-9bb5-8617-29bd7d9d9cfe",
+				version = 2,
+			},
+		},
+		
+		{
+			data = 
+			{
+				actions = 
+				{
+					
+					{
+						data = 
+						{
+							aType = "Lua",
+							actionLua = "local N=data.kaptinNecron\nif not N or not N.gc then return end\nN.gc.onTether(eventArgs)\nself.used=true",
+							conditions = 
+							{
+								
+								{
+									"e33ce75e-1fb0-24cf-8cb0-9b5fd12309b4",
+									true,
+								},
+								
+								{
+									"4186e267-6652-ca39-aea0-62c846c5c502",
+									true,
+								},
+							},
+							name = "[Draw] GC 2 red beam forecast",
+							uuid = "ef4699f6-7a2e-763e-ae0e-74ecedcf4395",
+							version = 2.1,
+						},
+					},
+				},
+				conditions = 
+				{
+					
+					{
+						data = 
+						{
+							category = "Event",
+							dequeueIfLuaFalse = true,
+							eventArgType = 5,
+							eventIntValue = 343,
+							name = "Tether minimum",
+							uuid = "e33ce75e-1fb0-24cf-8cb0-9b5fd12309b4",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Event",
+							comparator = 2,
+							dequeueIfLuaFalse = true,
+							eventArgType = 5,
+							eventIntValue = 344,
+							name = "Tether maximum",
+							uuid = "4186e267-6652-ca39-aea0-62c846c5c502",
+							version = 3,
+						},
+					},
+				},
+				displayPath = "Hector draws",
+				eventType = 15,
+				loop = true,
+				mechanicTime = 605.2,
+				name = "[Draw] GC 2 red beam forecast",
+				timeRange = true,
+				timelineIndex = 110,
+				timerEndOffset = 55,
+				timerStartOffset = -10,
+				uuid = "527f6a7c-d980-a935-8775-bd5ea1373b19",
+				version = 2,
+			},
+		},
+		
+		{
+			data = 
+			{
+				actions = 
+				{
+					
+					{
+						data = 
+						{
+							aType = "Lua",
+							actionLua = "local N=data.kaptinNecron\nif not N or not N.gc then return end\nN.gc.onBeamChannel(eventArgs)\nself.used=true",
+							conditions = 
+							{
+								
+								{
+									"3c58c47f-c6d7-16cd-bf37-cf9e782a8213",
+									true,
+								},
+							},
+							name = "[Draw] GC 2 locked red beam",
+							uuid = "3400baf6-c2c1-0540-80d6-1e225dc4403c",
+							version = 2.1,
+						},
+					},
+				},
+				conditions = 
+				{
+					
+					{
+						data = 
+						{
+							category = "Event",
+							dequeueIfLuaFalse = true,
+							eventArgType = 2,
+							eventSpellID = 44569,
+							name = "Laser cast",
+							uuid = "3c58c47f-c6d7-16cd-bf37-cf9e782a8213",
+							version = 3,
+						},
+					},
+				},
+				displayPath = "Hector draws",
+				eventType = 3,
+				loop = true,
+				mechanicTime = 605.2,
+				name = "[Draw] GC 2 locked red beam",
+				timeRange = true,
+				timelineIndex = 110,
+				timerEndOffset = 55,
+				timerStartOffset = -10,
+				uuid = "5524072a-2a70-5763-99de-6e82eb2e5be1",
 				version = 2,
 			},
 		},
@@ -6071,23 +6029,8 @@ local tbl =
 			},
 		},
 	},
-	[123] = 
-	{
-		
-		{
-			data = 
-			{
-				displayPath = "",
-				name = "store\\anyone\\extremes\\necron\\main",
-				uuid = "6e9638b3-59e0-dfaf-df2c-4c715ba3fa83",
-			},
-			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
-			objectType = "folder",
-		},
-	},
 	inheritedProfiles = 
 	{
-		"store\\anyone\\extremes\\necron\\main",
 	},
 	timelineName = "necron-ex",
 	version = "1.0.1",
