@@ -405,7 +405,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "-- Native gates: SAM, Necron content 14093, targetable=false, timeline >=190.\nlocal boss=TensorCore.mGetEntity(eventArgs.entityID)\nif not boss or Argus.getEntityModel(boss)~=18699 then self.used=true return end\nlocal s=data.kaptinNecronSamCD\nif s and s.bossID~=boss.id then self.used=true return end\nif not s then\n    s={bossID=boss.id}\n    data.kaptinNecronSamCD=s\nend\nif not s.active then\n    if type(ACR_TensorWeeb4_CD)~=\"boolean\" then self.used=true return end\n    -- Snapshot and switch together so wipe recovery cannot see partial state.\n    s.previousCD=ACR_TensorWeeb4_CD\n    s.active=true\n    ACR_TensorWeeb4_CD=false\nend\nif s.darknessSeen then s.abyssStarted=true end\nself.used=true\n",
+							actionLua = "-- Native gates: SAM, Necron content 14093, targetable=false, timeline >=195.\nlocal boss=TensorCore.mGetEntity(eventArgs.entityID)\nif not boss or Argus.getEntityModel(boss)~=18699 then self.used=true return end\nlocal s=data.kaptinNecronSamCD\nif s and s.bossID~=boss.id then self.used=true return end\nif not s then\n    s={bossID=boss.id}\n    data.kaptinNecronSamCD=s\nend\nif not s.active then\n    if type(ACR_TensorWeeb4_CD)~=\"boolean\" then self.used=true return end\n    -- Snapshot and switch together so wipe recovery cannot see partial state.\n    s.previousCD=ACR_TensorWeeb4_CD\n    s.active=true\n    ACR_TensorWeeb4_CD=false\nend\n-- Capture once across both add sections, including an existing CD-only state.\nif s.previousDoTs==nil and type(ACR_TensorWeeb4_DoTs)==\"boolean\" then\n    s.previousDoTs=ACR_TensorWeeb4_DoTs\n    ACR_TensorWeeb4_DoTs=false\nend\nif s.darknessSeen then s.abyssStarted=true end\nself.used=true\n",
 							conditions = 
 							{
 								
@@ -424,7 +424,7 @@ local tbl =
 									true,
 								},
 							},
-							name = "[SAM] Hold CD through both add phases",
+							name = "[SAM] Hold CD and DoTs through both add phases",
 							uuid = "81847a49-3792-1f90-9b70-83c4ff64fe4a",
 							version = 2.1,
 						},
@@ -478,7 +478,7 @@ local tbl =
 				eventType = 26,
 				loop = true,
 				mechanicTime = 199.5,
-				name = "[SAM] Hold CD through both add phases",
+				name = "[SAM] Hold CD and DoTs through both add phases",
 				timeRange = true,
 				timelineIndex = 44,
 				timerEndOffset = 75.5,
@@ -498,7 +498,7 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "-- Runs only after the second departure; first add-wave return must not release.\nlocal s=data.kaptinNecronSamCD\nif not s or not s.active or not s.abyssStarted then return end\nlocal player=TensorCore.mGetPlayer()\nlocal boss=TensorCore.mGetEntity(s.bossID)\nif not player or not player.alive or not boss or not boss.alive\n    or not boss.targetable or not boss.attackable then return end\nif boss.contentid~=14093 or Argus.getEntityModel(boss)~=18699 then return end\nlocal p=player.pos\nif p.x<82 or p.x>118 or p.z<85 or p.z>115 or math.abs(p.y)>=5\n    or math.abs(p.y-boss.pos.y)>=5 then return end\nACR_TensorWeeb4_CD=s.previousCD\ns.active=false\nself.used=true\n",
+							actionLua = "-- Runs only after the second departure; first add-wave return must not release.\nlocal s=data.kaptinNecronSamCD\nif not s or not s.active or not s.abyssStarted then return end\nlocal player=TensorCore.mGetPlayer()\nlocal boss=TensorCore.mGetEntity(s.bossID)\nif not player or not player.alive or not boss or not boss.alive\n    or not boss.targetable or not boss.attackable then return end\nif boss.contentid~=14093 or Argus.getEntityModel(boss)~=18699 then return end\nlocal p=player.pos\nif p.x<82 or p.x>118 or p.z<85 or p.z>115 or math.abs(p.y)>=5\n    or math.abs(p.y-boss.pos.y)>=5 then return end\nACR_TensorWeeb4_CD=s.previousCD\nif type(s.previousDoTs)==\"boolean\" then ACR_TensorWeeb4_DoTs=s.previousDoTs end\ns.active=false\nself.used=true\n",
 							conditions = 
 							{
 								
@@ -512,7 +512,7 @@ local tbl =
 									true,
 								},
 							},
-							name = "[SAM] Resume CD after returning to Necron",
+							name = "[SAM] Restore CD and DoTs on Necron return",
 							uuid = "bb45c3cb-e64e-bb8e-a494-adcbbbe9dc32",
 							version = 2.1,
 						},
@@ -549,7 +549,7 @@ local tbl =
 				},
 				displayPath = "SAM burst",
 				mechanicTime = 199.5,
-				name = "[SAM] Resume CD after returning to Necron",
+				name = "[SAM] Restore CD and DoTs on Necron return",
 				throttleTime = 250,
 				timeRange = true,
 				timelineIndex = 44,
@@ -570,8 +570,8 @@ local tbl =
 						data = 
 						{
 							aType = "Lua",
-							actionLua = "-- TensorReactions clears data before OnWipe; restore from its documented snapshot.\nlocal previous=eventArgs.oldData\nlocal s=previous and previous.kaptinNecronSamCD\nif s and s.active then\n    ACR_TensorWeeb4_CD=s.previousCD\n    s.active=false\nend\nself.used=true\n",
-							name = "[SAM] Restore CD on wipe",
+							actionLua = "-- TensorReactions clears data before OnWipe; restore from its documented snapshot.\nlocal previous=eventArgs.oldData\nlocal s=previous and previous.kaptinNecronSamCD\nif s and s.active then\n    ACR_TensorWeeb4_CD=s.previousCD\n    if type(s.previousDoTs)==\"boolean\" then ACR_TensorWeeb4_DoTs=s.previousDoTs end\n    s.active=false\nend\nself.used=true\n",
+							name = "[SAM] Restore CD and DoTs on wipe",
 							uuid = "6828453a-fc45-78a0-864a-478364458733",
 							version = 2.1,
 						},
@@ -584,7 +584,7 @@ local tbl =
 				eventType = 9,
 				loop = true,
 				mechanicTime = 199.5,
-				name = "[SAM] Restore CD on wipe",
+				name = "[SAM] Restore CD and DoTs on wipe",
 				timeRange = true,
 				timelineIndex = 44,
 				timerEndOffset = 700.5,
