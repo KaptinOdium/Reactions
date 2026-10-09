@@ -17,17 +17,7 @@ local tbl =
 		{
 			data = 
 			{
-				displayPath = "",
-				name = "Viper Optimization",
-				uuid = "3727942a-28aa-66c2-bb0d-c46ea1c9a421",
-			},
-			objectType = "folder",
-		},
-		
-		{
-			data = 
-			{
-				name = "[VPR] DMU Burst Setup",
+				name = "[VPR] Pool Gauge",
 				uuid = "0ed1b987-db4e-f5ce-a6f1-e3ffa7cf3191",
 				version = 2,
 			},
@@ -36,158 +26,24 @@ local tbl =
 			{
 				actions = 
 				{
-					
-					{
-						position = 1,
-						type = "add",
-						value = 
-						{
-							data = 
-							{
-								aType = "ACR",
-								conditions = 
-								{
-									
-									{
-										"40adde6d-7862-f933-b892-ae1cd2280e1f",
-										true,
-									},
-								},
-								gVar = "ACR_TensorViper3_Burn",
-								gVarValue = 2,
-								uuid = "bd49b2e7-b091-5a11-9b21-92ce03a30f90",
-								version = 2.1,
-							},
-							inheritedIndex = 1,
-						},
-					},
-					
-					{
-						position = 2,
-						type = "add",
-						value = 
-						{
-							data = 
-							{
-								aType = "ACR",
-								conditions = 
-								{
-									
-									{
-										"40adde6d-7862-f933-b892-ae1cd2280e1f",
-										true,
-									},
-								},
-								gVar = "ACR_TensorViper3_WrithingSnap",
-								uuid = "a37c8cf1-9d2c-3903-93a8-2dc044eff658",
-								version = 2.1,
-							},
-							inheritedIndex = 2,
-						},
-					},
-					
-					{
-						type = "add",
-						value = 
-						{
-							data = 
-							{
-								name = "",
-								uuid = "61529f79-f77a-27b5-aa6d-01296c04ca19",
-								version = 2.1,
-							},
-							inheritedObjectUUID = "02f66603-17ff-7cd4-a265-4910d8231541",
-							inheritedOverwrites = 
-							{
-								conditions = 
-								{
-									
-									{
-										position = 1,
-										type = "add",
-										value = 
-										{
-											"40adde6d-7862-f933-b892-ae1cd2280e1f",
-											true,
-										},
-									},
-								},
-							},
-						},
-					},
-					
-					{
-						type = "add",
-						value = 
-						{
-							data = 
-							{
-								aType = "ACR",
-								conditions = 
-								{
-									
-									{
-										"40adde6d-7862-f933-b892-ae1cd2280e1f",
-										true,
-									},
-								},
-								gVar = "ACR_TensorViper3_NoHolds",
-								gVarValue = 2,
-								uuid = "4d008d64-66e1-e913-9fb1-92628cb71a4e",
-								version = 2.1,
-							},
-						},
-					},
-					
-					{
-						type = "add",
-						value = 
-						{
-							data = 
-							{
-								aType = "ACR",
-								conditions = 
-								{
-									
-									{
-										"40adde6d-7862-f933-b892-ae1cd2280e1f",
-										true,
-									},
-								},
-								gVar = "ACR_TensorViper3_Potion",
-								gVarValue = 2,
-								uuid = "099764a5-5d40-2710-b795-6f4bbb539d0b",
-								version = 2.1,
-							},
-						},
-					},
 				},
 				conditions = 
 				{
-					
-					{
-						type = "add",
-						value = 
-						{
-							data = 
-							{
-								category = "Self",
-								conditionType = 13,
-								jobValue = "VIPER",
-								name = "Viper",
-								uuid = "40adde6d-7862-f933-b892-ae1cd2280e1f",
-								version = 3,
-							},
-						},
-					},
 				},
-				displayPath = "Viper Optimization",
-				enabled = false,
-				name = "[VPR] DMU Burst Setup",
-				timeRange = true,
+				displayPath = "store\\anyone\\dmu\\main/anyone\\dmu\\modules\\optimization",
 				timerEndOffset = -7.2617654800415,
 				timerStartOffset = -14.761765480042,
 			},
+		},
+		
+		{
+			data = 
+			{
+				displayPath = "",
+				name = "Viper Optimization",
+				uuid = "3727942a-28aa-66c2-bb0d-c46ea1c9a421",
+			},
+			objectType = "folder",
 		},
 		
 		{
@@ -945,48 +801,6 @@ local tbl =
 			},
 			inheritanceRoot = "store\\anyone\\dmu\\main",
 			objectType = "folder",
-		},
-		
-		{
-			data = 
-			{
-				name = "[VPR] Hold Vicewinder 1",
-				uuid = "d7e830bd-5bec-0a94-8170-a502f83ebdbe",
-				version = 2,
-			},
-			inheritedObjectUUID = "06a02f4a-2fbc-cd04-b77b-af7d9e904cf1",
-			inheritedOverwrites = 
-			{
-				enabled = false,
-			},
-		},
-		
-		{
-			data = 
-			{
-				name = "[VPR] Hold Vicewinder 2",
-				uuid = "dc9ef6ef-1be5-f74b-9580-758ffb9ca9e4",
-				version = 2,
-			},
-			inheritedObjectUUID = "fcb3535c-271b-1782-ab20-abc6af30e223",
-			inheritedOverwrites = 
-			{
-				enabled = false,
-			},
-		},
-		
-		{
-			data = 
-			{
-				name = "[VPR] Hold Reawaken",
-				uuid = "be4be6ef-ca51-d4d5-bd2a-86d90971cc1b",
-				version = 2,
-			},
-			inheritedObjectUUID = "6929710b-5db9-3d83-9949-5ec28e5b9795",
-			inheritedOverwrites = 
-			{
-				enabled = false,
-			},
 		},
 	},
 	[40] = 
