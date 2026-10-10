@@ -3632,12 +3632,18 @@ local tbl =
 							aType = "Alert",
 							alertDuration = 4000,
 							alertPriority = 2,
+							alertScale = 0.5,
 							alertText = "LOOK AWAY - Demon Eye",
 							conditions = 
 							{
 								
 								{
 									"e54a15e6-84d7-20fc-aa5f-0ef5a99bdf3a",
+									true,
+								},
+								
+								{
+									"1ae5e7b0-928a-866f-a699-2c36c6acef91",
 									true,
 								},
 							},
@@ -3659,6 +3665,18 @@ local tbl =
 							eventSpellID = 50023,
 							name = "50023",
 							uuid = "e54a15e6-84d7-20fc-aa5f-0ef5a99bdf3a",
+							version = 3,
+						},
+					},
+					
+					{
+						data = 
+						{
+							category = "Lua",
+							conditionLua = "-- Four shadows channel together. Claim this volley before the immediate alert.\nlocal now = Now()\nlocal last = data.kaptinEnuoDemonEyeWarningAt\nif last and now >= last and now - last < 5000 then return false end\ndata.kaptinEnuoDemonEyeWarningAt = now\nreturn true",
+							dequeueIfLuaFalse = true,
+							name = "One warning per volley",
+							uuid = "1ae5e7b0-928a-866f-a699-2c36c6acef91",
 							version = 3,
 						},
 					},
