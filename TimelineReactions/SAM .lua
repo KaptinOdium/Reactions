@@ -162,6 +162,20 @@ local tbl =
 			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
 			objectType = "folder",
 		},
+		
+		{
+			data = 
+			{
+				name = "[Draw] Shotcall Reaping",
+				uuid = "560352c9-5bd5-3a28-8ad8-42221d44c342",
+				version = 2,
+			},
+			inheritedObjectUUID = "f8bdc104-c896-fbdb-b70e-b5e3571c1f82",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
+		},
 	},
 	[13] = 
 	{
@@ -187,6 +201,34 @@ local tbl =
 			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
 			objectType = "folder",
 		},
+		
+		{
+			data = 
+			{
+				name = "[Draw] Draw Blight",
+				uuid = "d0eaa49e-e001-c087-a1bd-1865ec7ffcdf",
+				version = 2,
+			},
+			inheritedObjectUUID = "8e87ff23-01f6-d19d-b21a-412518c7a3fa",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
+		},
+		
+		{
+			data = 
+			{
+				name = "[Draw] Shotcall Blight",
+				uuid = "680893b4-dc64-2182-9811-a5686961abe5",
+				version = 2,
+			},
+			inheritedObjectUUID = "5d4fbbd0-e03d-e8f3-9f9d-25ac842598cf",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
+		},
 	},
 	[16] = 
 	{
@@ -211,6 +253,20 @@ local tbl =
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
 			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				name = "[Draw] Shotcall Upcoming Reaping",
+				uuid = "5a05f282-7516-c7ba-ad5e-a75d748d1825",
+				version = 2,
+			},
+			inheritedObjectUUID = "6203c859-7be5-9f99-9623-5731f680adba",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
 		},
 	},
 	[17] = 
@@ -268,6 +324,20 @@ local tbl =
 			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
 			objectType = "folder",
 		},
+		
+		{
+			data = 
+			{
+				name = "[Draw] Shotcall Stored Reaping",
+				uuid = "f7590faa-d49e-d045-8ff2-d3418b72dd5e",
+				version = 2,
+			},
+			inheritedObjectUUID = "e0197c91-4713-2732-ae36-105571f4f5a9",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
+		},
 	},
 	[24] = 
 	{
@@ -292,6 +362,34 @@ local tbl =
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
 			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				name = "[Draw] Draw Blight",
+				uuid = "709d4ac2-e987-5d77-b86b-5fbd533deaec",
+				version = 2,
+			},
+			inheritedObjectUUID = "0b803236-d474-84b6-8aac-0b8af690f233",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
+		},
+		
+		{
+			data = 
+			{
+				name = "[Draw] Shotcall Blight",
+				uuid = "a591e7c4-f6ac-75d1-9781-eb794542505c",
+				version = 2,
+			},
+			inheritedObjectUUID = "f76e5db3-8d68-649b-996e-5141380a059f",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
 		},
 	},
 	[25] = 
@@ -835,6 +933,20 @@ local tbl =
 			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
 			objectType = "folder",
 		},
+		
+		{
+			data = 
+			{
+				name = "[Draw] RR Shotcall",
+				uuid = "c7f772ad-248b-6b6f-a55c-9ef8b16ef8c5",
+				version = 2,
+			},
+			inheritedObjectUUID = "8a75e02b-6a74-a927-89f7-c82ca22b5c0c",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
+		},
 	},
 	[63] = 
 	{
@@ -859,6 +971,20 @@ local tbl =
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
 			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				name = "[Draw] Season Shotcall",
+				uuid = "35ffe3ba-0759-7c90-8248-6f6efdbe6f59",
+				version = 2,
+			},
+			inheritedObjectUUID = "649c56b9-e418-be5b-b965-45e94ad690c8",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
 		},
 	},
 	[64] = 
@@ -929,6 +1055,20 @@ local tbl =
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
 			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				name = "[Draw] Draw Season",
+				uuid = "26ff8e3e-51a1-1443-848f-8196ad3e12fe",
+				version = 2,
+			},
+			inheritedObjectUUID = "2d78cc5a-5bfa-ff7d-98b3-cf4213242554",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
 		},
 	},
 	[69] = 
@@ -1106,6 +1246,20 @@ local tbl =
 			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
 			objectType = "folder",
 		},
+		
+		{
+			data = 
+			{
+				name = "[Draw] RR Shotcall",
+				uuid = "d6d12fd9-d3e8-08b3-8768-c1c3f27efda5",
+				version = 2,
+			},
+			inheritedObjectUUID = "3328e7b6-df81-1894-843d-481b9a78bca1",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
+		},
 	},
 	[89] = 
 	{
@@ -1130,6 +1284,20 @@ local tbl =
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
 			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				name = "[Draw] Season Shotcall",
+				uuid = "52366cce-d7e9-ebec-abdb-4bf88cf82efe",
+				version = 2,
+			},
+			inheritedObjectUUID = "163f6ad8-cb66-5b93-a8f3-7561b02e51fd",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
 		},
 	},
 	[90] = 
@@ -1200,6 +1368,20 @@ local tbl =
 			},
 			inheritanceRoot = "store\\anyone\\extremes\\necron\\main",
 			objectType = "folder",
+		},
+		
+		{
+			data = 
+			{
+				name = "[Draw] Draw Season",
+				uuid = "c06e5adc-2326-211e-87bf-bd1357b03c98",
+				version = 2,
+			},
+			inheritedObjectUUID = "fc29e9a9-f067-cbce-a777-8683870f5e23",
+			inheritedOverwrites = 
+			{
+				enabled = false,
+			},
 		},
 	},
 	[95] = 
